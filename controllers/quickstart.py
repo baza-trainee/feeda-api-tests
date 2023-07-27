@@ -41,7 +41,7 @@ def get_credentials():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                '../credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open('token.json', 'w') as token:
@@ -97,13 +97,14 @@ def process_messages():
                         if uidb64 and token:
                             uidb64_token_pairs.append((uidb64, token))
 
-
-            service.users().messages().delete(userId='me', id=message_id).execute()
+            # Remove the UNREAD label from the message to mark it as read
+            service.users().messages().modify(userId='me', id=message_id, body={'removeLabelIds': ['UNREAD']}).execute()
 
     except HttpError as error:
         print(f'An error occurred: {error}')
 
     return uidb64_token_pairs
+
 
 
 def main():

@@ -120,3 +120,4 @@ class TestAuth:
 
     def test_old_login(self):
         self.test_login
+
