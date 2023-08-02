@@ -71,7 +71,6 @@ class TestParticipantsPageOfTheAdminPanel:
         response_create = requests.request("POST", url, headers=headers, data=payload)
         assert response_create.status_code == status_code_for_create
 
-
     def get_id_participant(self, create_participant):
         response = create_participant
         parsed_response = response.json()

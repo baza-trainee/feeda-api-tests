@@ -1,4 +1,6 @@
+import json
 import pytest
+import requests
 
 
 class TestAuth:
@@ -41,7 +43,7 @@ class TestAuth:
     data_for_test_request_for_reset_password = [
         ("qafeeda123@gmail.com", 200),
         ("k@g.c", 400),
-        ("k"*71, 400),
+        ("k" * 71, 400),
         ("kozlov2777gmailcom", 400),
         ("", 400),
     ]
@@ -80,44 +82,116 @@ class TestAuth:
     ]
 
     @pytest.mark.parametrize("email, password, status_code", data_for_tests_login, ids=ids_for_data_for_tests_login)
-    def test_login(self, login, email, password, status_code):
-        response = login
+    def test_login(self, email, password, status_code):
+        url = "http://localhost:8000/users/login/"
+
+        payload = json.dumps({
+            "email": email,
+            "password": password
+        })
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic a296bG92Mjc3N0BnbWFpbC5jb206QmF6YTEyMzQ1'
+        }
+
+        response = requests.request("POST", url, headers=headers, data=payload)
         assert response.status_code == status_code
 
-# Добавити очікуваний результат на текст респонсу, коли буде виправлено баг
+    # Добавити очікуваний результат на текст респонсу, коли буде виправлено баг
     @pytest.mark.parametrize("email, status_code", data_for_test_request_for_reset_password,
                              ids=ids_for_test_request_for_reset_password)
-    def test_request_for_reset_password(self, request_for_reset_password, email, status_code):
-        response = request_for_reset_password
+    def test_request_for_reset_password(self, email, status_code):
+        url = "http://localhost:8000/users/reset-password-email/"
+
+        payload = json.dumps({
+            "email": email
+        })
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request("POST", url, headers=headers, data=payload)
         assert response.status_code == status_code
 
     @pytest.mark.parametrize("password, confirm_password", data_for_reset, ids=ids_data_for_reset)
-    def test_reset_password(self, reset_password, password, confirm_password):
-        response = reset_password
+    def test_reset_password(self, password, confirm_password):
+        url = "http://localhost:8000//users/password-reset-complete/"
+        pairs = process_messages()  # Отримуємо список пар 'uidb64' і 'token'
+        for uidb64, token in pairs:
+            payload = json.dumps({
+                "password": password,
+                "confirm_password": confirm_password,
+                "token": token,
+                "uidb64": uidb64
+            })
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request("PATCH", url, headers=headers, data=payload)
         assert response.status_code == 201
 
     @pytest.mark.parametrize("email, password, status_code", data_for_login_with_new_password,
                              ids=ids_for_login_with_new_password)
-    def test_login_with_new_password(self, login, email, password, status_code):
-        response = login
+    def test_login_with_new_password(self, email, password, status_code):
+        url = "http://localhost:8000/users/login/"
+
+        payload = json.dumps({
+            "email": email,
+            "password": password
+        })
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic a296bG92Mjc3N0BnbWFpbC5jb206QmF6YTEyMzQ1'
+        }
+
+        response = requests.request("POST", url, headers=headers, data=payload)
         assert response.status_code == status_code
 
-    def test_logout(self, logout):
-        response = logout
+    def test_logout(self, token):
+        url = "http://localhost:8000/users/logout/"
+
+        payload = ""
+        headers = {
+            'Authorization': 'Token ' + token
+        }
+
+        response = requests.request("DELETE", url, headers=headers, data=payload)
         assert response.status_code == 200
 
     @pytest.mark.parametrize("email, status_code", email_for_post_condition,
                              ids=ids_for_email_for_post_condition)
-    def test_post_condition_request_for_reset_password(self, request_for_reset_password, email, status_code):
-        response = request_for_reset_password
+    def test_post_condition_request_for_reset_password(self, email, status_code):
+        url = "http://localhost:8000/users/reset-password-email/"
+
+        payload = json.dumps({
+            "email": email
+        })
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request("POST", url, headers=headers, data=payload)
         assert response.status_code == status_code
 
     @pytest.mark.parametrize("password, confirm_password", data_post_condition_password,
                              ids=ids_for_data_post_condition_password)
-    def test_post_condition_reset_password(self, reset_password, password, confirm_password):
-        response = reset_password
+    def test_post_condition_reset_password(self, password, confirm_password):
+        url = "http://localhost:8000//users/password-reset-complete/"
+        pairs = process_messages()  # Отримуємо список пар 'uidb64' і 'token'
+        for uidb64, token in pairs:
+            payload = json.dumps({
+                "password": password,
+                "confirm_password": confirm_password,
+                "token": token,
+                "uidb64": uidb64
+            })
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request("PATCH", url, headers=headers, data=payload)
         assert response.status_code == 201
 
     def test_old_login(self):
         self.test_login
-
