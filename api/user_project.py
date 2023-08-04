@@ -101,10 +101,9 @@ class UserProject:
 
     def create_project(self, data: dict) -> requests.Response:
         url = f"{self.base_url}/user-project/create-project/"
-        headers = {"Content-Type": "application/json"}
 
         try:
-            response = requests.post(url, headers=headers, json=data)
+            response = requests.post(url, headers=self.headers, json=data)
             response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
@@ -170,10 +169,9 @@ class UserProject:
 
     def join(self, data: dict) -> requests.Response:
         url = f"{self.base_url}/user-project/join/"
-        headers = {"Content-Type": "application/json"}
 
         try:
-            response = requests.post(url, headers=headers, json=data)
+            response = requests.post(url, headers=self.headers, json=data)
             response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
@@ -188,10 +186,9 @@ class UserProject:
 
     def update_participant(self, participant_id: str, data: dict) -> requests.Response:
         url = f"{self.base_url}/user-project/participant-detail/{participant_id}/"
-        headers = {"Content-Type": "application/json"}
 
         try:
-            response = requests.put(url, headers=headers, json=data)
+            response = requests.put(url, headers=self.headers, json=data)
             response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
@@ -240,6 +237,7 @@ class UserProject:
 
     def user_project_project_read(self, project_url: str) -> requests.Response:
         url = f"{self.base_url}/user-project/project/{project_url}/"
+
         try:
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
@@ -256,6 +254,7 @@ class UserProject:
 
     def user_project_project_update(self, project_url: str, data: dict) -> requests.Response:
         url = f"{self.base_url}/user-project/project/{project_url}/"
+
         try:
             response = requests.put(url, headers=self.headers, json=data)
             response.raise_for_status()
@@ -272,6 +271,7 @@ class UserProject:
 
     def user_project_project_delete(self, project_url: str) -> requests.Response:
         url = f"{self.base_url}/user-project/project/{project_url}/"
+
         try:
             response = requests.delete(url, headers=self.headers)
             response.raise_for_status()
@@ -288,6 +288,7 @@ class UserProject:
 
     def user_project_projects_list(self) -> requests.Response:
         url = f"{self.base_url}/user-project/projects/"
+
         try:
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
@@ -304,6 +305,7 @@ class UserProject:
 
     def user_project_send_read(self, user_id: str) -> requests.Response:
         url = f"{self.base_url}/user-project/send/{user_id}/"
+
         try:
             response = requests.get(url, headers=self.headers)
             response.raise_for_status()
