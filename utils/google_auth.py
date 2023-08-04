@@ -35,7 +35,7 @@ def get_credentials():
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
 
-    # If there are no (valid) credentials available, let the user log in.
+    # If there are no (valid) credentials available, let the users log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -152,7 +152,7 @@ if __name__ == '__main__':
 #
 # def get_link():
 #     """Shows basic usage of the Gmail API.
-#     Lists the user's Gmail labels.
+#     Lists the users's Gmail labels.
 #     """
 #     uidb64_token_pairs = []  # Створюємо список для збереження пар 'uidb64' і 'token'
 #
@@ -160,7 +160,7 @@ if __name__ == '__main__':
 #     # Ваші імпорти та інші частини функції залишаються без змін...
 #     if os.path.exists('token.json'):
 #         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-#         # If there are no (valid) credentials available, let the user log in.
+#         # If there are no (valid) credentials available, let the users log in.
 #     if not creds or not creds.valid:
 #         if creds and creds.expired and creds.refresh_token:
 #             creds.refresh(Request())
