@@ -1,16 +1,16 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 
-from models.complexity import Complexity
-from models.status_project import StatusProject
-from models.type_project import TypeProject
+from models.complexity import ComplexityModel
+from models.status_project import StatusProjectModel
+from models.type_project import TypeProjectModel
 
 
-class DetailProject(BaseModel):
+class DetailProjectModel(BaseModel):
     id: Optional[int]
-    type_project: TypeProject
-    complexity: Complexity
-    project_status: StatusProject
+    type_project: TypeProjectModel
+    complexity: ComplexityModel
+    project_status: StatusProjectModel
     title: str = Field(..., max_length=50, min_length=1)
     comment: Optional[str] = Field(None, max_length=50)
     start_date_project: str  # Assuming the format is a string representing a date

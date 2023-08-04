@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 from typing import List
 
-from models.project import Project
+from models.project import ProjectModel
 
 
-class CreateProjectParticipants(BaseModel):
+class CreateProjectParticipantsModel(BaseModel):
     id: int
     user: List[str]
-    project: Project
+    project: ProjectModel

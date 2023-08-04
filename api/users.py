@@ -1,7 +1,8 @@
 import os
 import requests
+import logging
 
-from utils.logger import log_response, logger
+from utils.logger import log_response
 
 
 class Auth:
@@ -21,10 +22,10 @@ class Auth:
             if response.status_code != 400:
                 response.raise_for_status()
         except requests.exceptions.RequestException as err:
-            logger.error(f"An error occurred: {err}")
+            logging.error(f"An error occurred: {err}")
             raise err
         except Exception as err:
-            logger.error(f"An unknown error occurred: {err}")
+            logging.error(f"An unknown error occurred: {err}")
             raise err
 
         log_response(response)
@@ -42,10 +43,10 @@ class Auth:
             if response.status_code != 400:
                 response.raise_for_status()
         except requests.exceptions.RequestException as err:
-            logger.error(f"An error occurred: {err}")
+            logging.error(f"An error occurred: {err}")
             raise err
         except Exception as err:
-            logger.error(f"An unknown error occurred: {err}")
+            logging.error(f"An unknown error occurred: {err}")
             raise err
 
         log_response(response)
@@ -59,10 +60,10 @@ class Auth:
             response = requests.patch(url, headers=self.headers, json=new_password_data)
             response.raise_for_status()
         except requests.exceptions.RequestException as err:
-            logger.error(f"An error occurred: {err}")
+            logging.error(f"An error occurred: {err}")
             raise err
         except Exception as err:
-            logger.error(f"An unknown error occurred: {err}")
+            logging.error(f"An unknown error occurred: {err}")
             raise err
 
         log_response(response)
@@ -76,10 +77,10 @@ class Auth:
             response = requests.get(url)
             response.raise_for_status()
         except requests.exceptions.RequestException as err:
-            logger.error(f"An error occurred: {err}")
+            logging.error(f"An error occurred: {err}")
             raise err
         except Exception as err:
-            logger.error(f"An unknown error occurred: {err}")
+            logging.error(f"An unknown error occurred: {err}")
             raise err
 
         log_response(response)
@@ -94,10 +95,10 @@ class Auth:
             if response.status_code != 400:
                 response.raise_for_status()
         except requests.exceptions.RequestException as err:
-            logger.error(f"An error occurred: {err}")
+            logging.error(f"An error occurred: {err}")
             raise err
         except Exception as err:
-            logger.error(f"An unknown error occurred: {err}")
+            logging.error(f"An unknown error occurred: {err}")
             raise err
 
         log_response(response)
