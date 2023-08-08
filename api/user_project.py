@@ -19,7 +19,8 @@ class UserProject:
 
         try:
             response = requests.post(url, headers=self.headers, json=data)
-            response.raise_for_status()
+            if response.status_code != 400:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -53,7 +54,8 @@ class UserProject:
 
         try:
             response = requests.put(url, headers=self.headers, json=data)
-            response.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -70,7 +72,8 @@ class UserProject:
 
         try:
             response = requests.post(url, headers=self.headers, json=data)
-            response.raise_for_status()
+            if response.status_code != 400:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -104,7 +107,8 @@ class UserProject:
 
         try:
             response = requests.post(url, headers=self.headers, json=data)
-            response.raise_for_status()
+            if response.status_code != 400:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -121,7 +125,8 @@ class UserProject:
 
         try:
             response = requests.get(url)
-            response.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -138,7 +143,8 @@ class UserProject:
 
         try:
             response = requests.get(url)
-            response.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -155,7 +161,8 @@ class UserProject:
 
         try:
             response = requests.get(url)
-            response.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -172,7 +179,8 @@ class UserProject:
 
         try:
             response = requests.post(url, headers=self.headers, json=data)
-            response.raise_for_status()
+            if response.status_code != 400:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -189,7 +197,8 @@ class UserProject:
 
         try:
             response = requests.put(url, headers=self.headers, json=data)
-            response.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -206,7 +215,8 @@ class UserProject:
 
         try:
             response = requests.delete(url)
-            response.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -235,12 +245,13 @@ class UserProject:
 
         return response
 
-    def user_project_project_read(self, project_url: str) -> requests.Response:
+    def project_read(self, project_url: str) -> requests.Response:
         url = f"{self.base_url}/user-project/project/{project_url}/"
 
         try:
             response = requests.get(url, headers=self.headers)
-            response.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -252,12 +263,13 @@ class UserProject:
 
         return response
 
-    def user_project_project_update(self, project_url: str, data: dict) -> requests.Response:
+    def project_update(self, project_url: str, data: dict) -> requests.Response:
         url = f"{self.base_url}/user-project/project/{project_url}/"
 
         try:
             response = requests.put(url, headers=self.headers, json=data)
-            response.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -269,12 +281,13 @@ class UserProject:
 
         return response
 
-    def user_project_project_delete(self, project_url: str) -> requests.Response:
+    def project_delete(self, project_url: str) -> requests.Response:
         url = f"{self.base_url}/user-project/project/{project_url}/"
 
         try:
             response = requests.delete(url, headers=self.headers)
-            response.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
@@ -286,7 +299,7 @@ class UserProject:
 
         return response
 
-    def user_project_projects_list(self) -> requests.Response:
+    def projects_list(self) -> requests.Response:
         url = f"{self.base_url}/user-project/projects/"
 
         try:
@@ -303,12 +316,13 @@ class UserProject:
 
         return response
 
-    def user_project_send_read(self, user_id: str) -> requests.Response:
+    def send_read(self, user_id: str) -> requests.Response:
         url = f"{self.base_url}/user-project/send/{user_id}/"
 
         try:
             response = requests.get(url, headers=self.headers)
-            response.raise_for_status()
+            if response.status_code != 404:
+                response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err
