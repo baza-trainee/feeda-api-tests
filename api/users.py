@@ -1,21 +1,17 @@
-import os
 import requests
 import logging
 
 from utils.logger import log_response
 
 
-class Auth:
-    def __init__(self):
-        self.base_url = os.environ["BASE_URL"]
+class Users:
+    def __init__(self, config: dict):
+        self.base_url = config.get("base_url")
         self.headers = {"Content-Type": "application/json"}
 
     def login(self, email: str, password: str) -> requests.Response:
         url = f"{self.base_url}/users/login/"
-        data = {
-            "email": email,
-            "password": password
-        }
+        data = {"email": email, "password": password}
 
         try:
             response = requests.post(url, headers=self.headers, json=data)
@@ -32,11 +28,8 @@ class Auth:
 
         return response
 
-    def logout(self, token: str) -> requests.Response:
+    def logout(self, data: dict) -> requests.Response:
         url = f"{self.base_url}/users/logout/"
-        data = {
-            "token": token,
-        }
 
         try:
             response = requests.delete(url, headers=self.headers, json=data)
@@ -53,11 +46,11 @@ class Auth:
 
         return response
 
-    def password_reset_complete(self, new_password_data: dict) -> requests.Response:
+    def password_reset_complete(self, data: dict) -> requests.Response:
         url = f"{self.base_url}/users/password-reset-complete/"
 
         try:
-            response = requests.patch(url, headers=self.headers, json=new_password_data)
+            response = requests.patch(url, headers=self.headers, json=data)
             response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")

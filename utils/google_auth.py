@@ -9,21 +9,20 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 
-SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
-
+SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 
 
 def extract_links(text):
-    pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    pattern = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
     return re.findall(pattern, text)
 
 
 def extract_links_data(link):
-    pattern = r'/users/password-reset/(?P<uidb64>[^/]+)/(?P<token>[^/]+)/'
+    pattern = r"/users/password-reset/(?P<uidb64>[^/]+)/(?P<token>[^/]+)/"
     match = re.search(pattern, link)
     if match:
-        uidb64 = match.group('uidb64')
-        token = match.group('token')
+        uidb64 = match.group("uidb64")
+        token = match.group("token")
         return uidb64, token
     else:
         return None, None
@@ -32,8 +31,8 @@ def extract_links_data(link):
 def get_credentials():
     creds = None
     # Check if the token file exists
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    if os.path.exists("token.json"):
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
 
     # If there are no (valid) credentials available, let the users log in.
     if not creds or not creds.valid:
@@ -41,16 +40,17 @@ def get_credentials():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                '../credentials.json', SCOPES)
+                "../credentials.json", SCOPES
+            )
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open('token.json', 'w') as token:
+        with open("token.json", "w") as token:
             token.write(creds.to_json())
 
     return creds
 
 
-def process_messages():
+def process_messages() -> tuple:
     uidb64_token_pairs = []
 
     # Get credentials
@@ -58,28 +58,35 @@ def process_messages():
 
     try:
         # Call the Gmail API
-        service = build('gmail', 'v1', credentials=creds)
-        query = 'is:unread from:feedabaza@gmail.com'
-        messages = service.users().messages().list(userId='me', q=query).execute()
+        service = build("gmail", "v1", credentials=creds)
+        query = "is:unread from:feedabaza@gmail.com"
+        messages = service.users().messages().list(userId="me", q=query).execute()
 
-        if 'messages' not in messages:
+        if "messages" not in messages:
             print('No unread messages from "feedabaza@gmail.com".')
-            return uidb64_token_pairs
+            return tuple(uidb64_token_pairs)
 
-        unread_messages = messages['messages']
+        unread_messages = messages["messages"]
 
         for message in unread_messages:
-            message_id = message['id']
+            message_id = message["id"]
 
-            full_message = service.users().messages().get(userId='me', id=message_id, format='full').execute()
+            full_message = (
+                service.users()
+                .messages()
+                .get(userId="me", id=message_id, format="full")
+                .execute()
+            )
 
-            if 'payload' in full_message and 'parts' in full_message['payload']:
-                parts = full_message['payload']['parts']
+            if "payload" in full_message and "parts" in full_message["payload"]:
+                parts = full_message["payload"]["parts"]
                 for part in parts:
-                    part_data = part['body']['data']
-                    part_data_decoded = base64.urlsafe_b64decode(part_data.encode('ASCII')).decode('utf-8')
+                    part_data = part["body"]["data"]
+                    part_data_decoded = base64.urlsafe_b64decode(
+                        part_data.encode("ASCII")
+                    ).decode("utf-8")
 
-                    if part['mimeType'] == 'text/plain':
+                    if part["mimeType"] == "text/plain":
                         links = extract_links(part_data_decoded)
                         for link in links:
                             uidb64, token = extract_links_data(link)
@@ -87,10 +94,12 @@ def process_messages():
                                 uidb64_token_pairs.append((uidb64, token))
 
             else:
-                part_data = full_message['payload']['body']['data']
-                part_data_decoded = base64.urlsafe_b64decode(part_data.encode('ASCII')).decode('utf-8')
+                part_data = full_message["payload"]["body"]["data"]
+                part_data_decoded = base64.urlsafe_b64decode(
+                    part_data.encode("ASCII")
+                ).decode("utf-8")
 
-                if full_message['payload']['mimeType'] == 'text/plain':
+                if full_message["payload"]["mimeType"] == "text/plain":
                     links = extract_links(part_data_decoded)
                     for link in links:
                         uidb64, token = extract_links_data(link)
@@ -98,24 +107,25 @@ def process_messages():
                             uidb64_token_pairs.append((uidb64, token))
 
             # Remove the UNREAD label from the message to mark it as read
-            service.users().messages().modify(userId='me', id=message_id, body={'removeLabelIds': ['UNREAD']}).execute()
+            service.users().messages().modify(
+                userId="me", id=message_id, body={"removeLabelIds": ["UNREAD"]}
+            ).execute()
 
     except HttpError as error:
-        print(f'An error occurred: {error}')
+        print(f"An error occurred: {error}")
 
-    return uidb64_token_pairs
-
+    return tuple(uidb64_token_pairs)
 
 
 def main():
     pairs = process_messages()
     for uidb64, token in pairs:
-        print('UIDB64:', uidb64)
-        print('Token:', token)
+        print("UIDB64:", uidb64)
+        print("Token:", token)
     print(pairs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
 

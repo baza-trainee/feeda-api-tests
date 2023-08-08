@@ -1,4 +1,3 @@
-import os
 import requests
 import logging
 
@@ -6,12 +5,12 @@ from utils.logger import log_response
 
 
 class UserProject:
-    def __init__(self, token: str):
-        self.base_url = os.environ["BASE_URL"]
+    def __init__(self, token: str, config: dict):
+        self.base_url = config.get("base_url")
         self.token = token
         self.headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Token {self.token}"
+            "Authorization": f"Token {self.token}",
         }
 
     def add_participant(self, data: dict) -> requests.Response:

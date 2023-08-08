@@ -14,7 +14,7 @@ def log_response(response: requests.models.Response):
         response (requests.models.Response): The HTTP response to log.
     """
     # Check if the response has a JSON body
-    if response.headers.get('content-type') == 'application/json':
+    if response.headers.get("content-type") == "application/json":
         try:
             # Pretty-print the JSON response
             body = json.dumps(response.json(), indent=4)
