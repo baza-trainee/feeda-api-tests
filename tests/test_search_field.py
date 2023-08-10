@@ -1,43 +1,35 @@
-import requests
 import pytest
 
 
 class TestSearchField:
-    lastnames = []
-    ids_lastnames = []
+    #TODO перероби апі потрібно передавати параметр
 
-    @pytest.mark.parametrize("lastname, status_code", lastnames, ids=ids_lastnames)
-    def test_search_participant_by_lastname(self, token, lastname, status_code):
-        url = f"http://localhost:8000/user-project/filter-participant/?last_name={lastname}"
-
-        payload = {}
-        headers = {"Authorization": "Token " + token}
-
-        response = requests.request("GET", url, headers=headers, data=payload)
+    @pytest.mark.parametrize("lastname, status_code",
+                             pytest.param("Luzina", 200, id="Valid lastname"),
+                             pytest.param("invalid", 400, id="Invalid lastname"),
+                             pytest.param("invalid2", 400, id="Invalid lastname2"),
+                             )
+    def test_search_participant_by_lastname(self, user_project, lastname, status_code, participant):
+        participant.raise_for_status()
+        response = user_project.filter_participant(lastname=lastname)
         assert response.status_code == status_code
 
-    speciality = []
-    ids_speciality = []
+    #TODO НАгадати владу зробити цей запит
 
-    @pytest.mark.parametrize("speciality, status_code", speciality, ids=ids_speciality)
-    def test_search_participant_by_speciality(self, token, speciality, status_code):
-        url = f"http://localhost:8000/user-project/filter-participant/?speciality={speciality}"
-
-        payload = {}
-        headers = {"Authorization": "Token " + token}
-
-        response = requests.request("GET", url, headers=headers, data=payload)
+    @pytest.mark.parametrize("speciality, status_code",
+                             pytest.param("QA", 200, id="Valid speciality"),
+                             pytest.param("Gamer", 400, id="Invalid speciality"),
+                             )
+    def test_search_participant_by_speciality(self, user_project, speciality, status_code):
+        response = user_project.filter_participant(speciality=speciality)
         assert response.status_code == status_code
 
-    titles = []
-    ids_titles = []
 
-    @pytest.mark.parametrize("title, status_code", titles, ids=ids_titles)
-    def test_search_project_by_title(self, token, title, status_code):
-        url = f"http://localhost:8000/user-project/filter-project/?title={title}"
 
-        payload = {}
-        headers = {"Authorization": "Token " + token}
-
-        response = requests.request("GET", url, headers=headers, data=payload)
+    @pytest.mark.parametrize("title, status_code",
+                             pytest.param("Feeda", 200, id="Valid title"),
+                             pytest.param("Test", 400, id="Invalid title"),
+                             )
+    def test_search_project_by_title(self, user_project, title, status_code):
+        response = user_project.filter_project(title=title)
         assert response.status_code == status_code

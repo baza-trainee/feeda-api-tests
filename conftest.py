@@ -84,7 +84,7 @@ def project(token):
 
 
 @pytest.fixture
-def create_participant(token):
+def participant(token):
     url = "http://localhost:8000/user-project/add-participant/"
 
     payload = json.dumps(
