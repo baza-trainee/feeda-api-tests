@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 
-class ParticipantUpdateDeleteModel(BaseModel):
+class ParticipantUpdateDeleteResponse(BaseModel):
     id: str = Field(..., max_length=36)  # Assuming the format is a UUID string
     first_name: str = Field(..., max_length=20, min_length=1)
     last_name: str = Field(..., max_length=50, min_length=1)
