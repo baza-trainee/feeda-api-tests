@@ -1,6 +1,16 @@
 import pytest
 
+from pydantic import ValidationError
+
 from utils.google_auth import process_messages
+from models.users import (
+    LoginSuccessResponse,
+    LoginErrorResponse,
+    NewPasswordSuccessResponse,
+    ResetPasswordEmailSuccessResponse,
+    ResetPasswordEmailErrorResponse,
+    LogoutError,
+)
 
 
 class TestAuth:
@@ -13,6 +23,21 @@ class TestAuth:
                 200,
                 id="The system returns status code 200 if the request is successful",
             ),
+        ],
+    )
+    def test_login_success(self, email, password, status_code, users):
+        response = users.login(email=email, password=password)
+
+        assert response.status_code == status_code
+
+        try:
+            LoginSuccessResponse(**response.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
+
+    @pytest.mark.parametrize(
+        "email,password,status_code",
+        [
             pytest.param(
                 "example@gmail.com",
                 "Baza12345",
@@ -118,12 +143,16 @@ class TestAuth:
             ),
         ],
     )
-    def test_login(self, email, password, status_code, users):
+    def test_login_errors(self, email, password, status_code, users):
         response = users.login(email=email, password=password)
 
         assert response.status_code == status_code
 
-    # TODO: add expected result, when bug will be fixed
+        try:
+            LoginErrorResponse(**response.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
+
     @pytest.mark.parametrize(
         "email,status_code",
         [
@@ -132,6 +161,22 @@ class TestAuth:
                 200,
                 id="The system returns status code 200 if the request is successful.",
             ),
+        ],
+    )
+    def test_reset_password_email_success(self, email, status_code, users):
+        payload = {"email": email}
+        response = users.reset_password_email(data=payload)
+
+        assert response.status_code == status_code
+
+        try:
+            ResetPasswordEmailSuccessResponse(**response.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
+
+    @pytest.mark.parametrize(
+        "email,status_code",
+        [
             pytest.param(
                 "k@g.c",
                 400,
@@ -156,17 +201,29 @@ class TestAuth:
             ),
         ],
     )
-    def test_request_for_reset_password(self, email, status_code, users):
+    def test_reset_password_email_errors(self, email, status_code, users):
         payload = {"email": email}
         response = users.reset_password_email(data=payload)
 
         assert response.status_code == status_code
 
+        try:
+            ResetPasswordEmailErrorResponse(**response.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
+
     @pytest.mark.parametrize(
         "password,confirm_password",
-        [pytest.param("QABaza546", "QABaza546", id="reset new password")],
+        [
+            pytest.param(
+                "QABaza546",
+                "QABaza546",
+                "qafeeda123@gmail.com",
+                id="reset new password",
+            )
+        ],
     )
-    def test_reset_password(self, password, confirm_password, users):
+    def test_new_password(self, password, confirm_password, email, users):
         uidb64, token = process_messages()
         payload = {
             "password": password,
@@ -174,34 +231,25 @@ class TestAuth:
             "token": token,
             "uidb64": uidb64,
         }
-
         response = users.password_reset_complete(data=payload)
 
         assert response.status_code == 201
 
-    @pytest.mark.parametrize(
-        "email,password,status_code",
-        [
-            pytest.param(
-                "qafeeda123@gmail.com",
-                "QABaza546",
-                200,
-                id="check that return code 200 with new password",
-            ),
-            pytest.param(
-                "qafeeda123@gmail.com",
-                "BazaQA123",
-                400,
-                id="check that return code 400 with old password",
-            ),
-        ],
-    )
-    def test_login_with_new_password(self, email, password, status_code, users):
+        try:
+            NewPasswordSuccessResponse(**response.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
+
         response = users.login(email=email, password=password)
 
-        assert response.status_code == status_code
+        assert response.status_code == 200
 
-    def test_logout(self, users, config):
+        try:
+            LoginSuccessResponse(**response.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
+
+    def test_logout_success(self, users, config):
         login_response = users.login(
             email=config.get("username"), password=config.get("password")
         )
@@ -210,6 +258,21 @@ class TestAuth:
         response = users.logout(data=payload)
 
         assert response.status_code == 200
+
+    def test_logout_errors(self, users, config):
+        login_response = users.login(
+            email=config.get("username"), password=config.get("password")
+        )
+        payload = {"token": login_response.json()["token"] + "wrong_token"}
+
+        response = users.logout(data=payload)
+
+        assert response.status_code == 400
+
+        try:
+            LogoutError(**response.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
 
     @pytest.mark.parametrize(
         "email,status_code",
@@ -223,6 +286,11 @@ class TestAuth:
         response = users.reset_password_email(data=payload)
 
         assert response.status_code == status_code
+
+        try:
+            ResetPasswordEmailSuccessResponse(**response.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
 
     @pytest.mark.parametrize(
         "password,confirm_password",
@@ -243,5 +311,7 @@ class TestAuth:
 
         assert response.status_code == 201
 
-    # def test_old_login(self):
-    #     self.test_login
+        try:
+            NewPasswordSuccessResponse(**response.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
