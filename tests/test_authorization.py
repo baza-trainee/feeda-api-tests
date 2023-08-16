@@ -213,7 +213,7 @@ class TestAuth:
             pytest.fail(f"Response validation failed: {err}")
 
     @pytest.mark.parametrize(
-        "password,confirm_password",
+        "password,confirm_password,email",
         [
             pytest.param(
                 "QABaza546",

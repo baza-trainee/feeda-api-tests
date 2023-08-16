@@ -10,7 +10,7 @@ from api.user_project import UserProject
 
 @pytest.fixture(scope="session")
 def config():
-    config_file_path = os.path.join("config", "config.ini")
+    config_file_path = os.path.join("../config", "config.ini")
     config_parser = configparser.ConfigParser(os.environ)
     config_parser.read(config_file_path)
 
