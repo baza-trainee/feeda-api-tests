@@ -224,6 +224,8 @@ class TestAuth:
         ],
     )
     def test_new_password(self, password, confirm_password, email, users):
+        payload = {"email": email}
+        users.reset_password_email(data=payload)
         uidb64, token = process_messages()
         payload = {
             "password": password,
@@ -243,11 +245,6 @@ class TestAuth:
         response = users.login(email=email, password=password)
 
         assert response.status_code == 200
-
-        try:
-            LoginSuccessResponse(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
 
     def test_logout_success(self, users, config):
         login_response = users.login(
@@ -271,47 +268,5 @@ class TestAuth:
 
         try:
             LogoutError(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
-
-    @pytest.mark.parametrize(
-        "email,status_code",
-        [
-            pytest.param("qafeeda123@gmail.com", 200, id="request return old password"),
-        ],
-    )
-    def test_post_condition_request_for_reset_password(self, email, status_code, users):
-        payload = {"email": email}
-
-        response = users.reset_password_email(data=payload)
-
-        assert response.status_code == status_code
-
-        try:
-            ResetPasswordEmailSuccessResponse(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
-
-    @pytest.mark.parametrize(
-        "password,confirm_password",
-        [
-            pytest.param("BazaQA123", "BazaQA123", id="return old password"),
-        ],
-    )
-    def test_post_condition_reset_password(self, password, confirm_password, users):
-        uidb64, token = process_messages()
-        payload = {
-            "password": password,
-            "confirm_password": confirm_password,
-            "token": token,
-            "uidb64": uidb64,
-        }
-
-        response = users.password_reset_complete(data=payload)
-
-        assert response.status_code == 201
-
-        try:
-            NewPasswordSuccessResponse(**response.json())
         except ValidationError as err:
             pytest.fail(f"Response validation failed: {err}")

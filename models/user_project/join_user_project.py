@@ -1,12 +1,11 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from uuid import UUID
-import re
 
 
 class JoinUserProjectResponse(BaseModel):
     id: Optional[UUID] = None  # readOnly
-    account_discord: str = re.compile(r"^\w+#\d{4}$")  # Pattern match
+    account_discord: str
     first_name: str
     last_name: str
     phone_number: Optional[str] = None  # x-nullable
