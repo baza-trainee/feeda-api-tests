@@ -18,8 +18,8 @@ class TestAuth:
         "email,password,status_code",
         [
             pytest.param(
-                "kozlov2777@gmail.com",
-                "Baza12345",
+                "admin123@gmail.com",
+                "Feeda12345",
                 200,
                 id="The system returns status code 200 if the request is successful",
             ),

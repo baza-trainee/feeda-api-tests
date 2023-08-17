@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
+from typing import List
 
 
 class ParticipantUpdateDeleteResponse(BaseModel):
@@ -15,5 +16,5 @@ class ParticipantUpdateDeleteResponse(BaseModel):
     experience: bool
     stack: Optional[str] = Field(None, max_length=300)
     speciality: Optional[int] = None
-    project: Optional[int] = None
+    project: Optional[List[int]] = None
     type_participant: Optional[int] = None

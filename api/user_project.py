@@ -159,7 +159,7 @@ class UserProject:
         url = f"{self.base_url}/user-project/get-participant/{participant_id}/"
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, headers=self.headers)
             if response.status_code != 404:
                 response.raise_for_status()
         except requests.exceptions.RequestException as err:
@@ -213,7 +213,7 @@ class UserProject:
         url = f"{self.base_url}/user-project/participant-detail/{participant_id}/"
 
         try:
-            response = requests.delete(url)
+            response = requests.delete(url, headers=self.headers)
             if response.status_code != 404:
                 response.raise_for_status()
         except requests.exceptions.RequestException as err:
@@ -231,7 +231,7 @@ class UserProject:
         url = f"{self.base_url}/user-project/participants-list/"
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, headers=self.headers)
             response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")

@@ -1,6 +1,9 @@
-import requests
 import json
 import pytest
+from pydantic import ValidationError
+# from models.user_project import (
+#     #TODO create model for create project
+# )
 
 
 class TestProjectAdminPanel:
