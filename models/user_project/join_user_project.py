@@ -1,6 +1,8 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from uuid import UUID
+import re
+from typing import List
 
 
 class JoinUserProjectResponse(BaseModel):
