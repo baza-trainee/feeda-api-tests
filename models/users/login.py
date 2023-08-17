@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class LoginSuccessResponse(BaseModel):
@@ -6,4 +6,11 @@ class LoginSuccessResponse(BaseModel):
 
 
 class LoginErrorResponse(BaseModel):
-    message: str = "Invalid data provided"
+    message: str
+
+    @field_validator('message')
+    def check_message(cls, value):
+        if value != "Invalid data":
+            raise ValueError(f"Incorrect value: {value}")
+
+        return value

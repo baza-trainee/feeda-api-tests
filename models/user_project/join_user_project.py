@@ -7,7 +7,7 @@ from typing import List
 
 class JoinUserProjectResponse(BaseModel):
     id: Optional[UUID] = None  # readOnly
-    account_discord: str = re.compile(r"^\w+#\d{4}$")  # Pattern match
+    account_discord: str
     first_name: str
     last_name: str
     phone_number: Optional[str] = None  # x-nullable
