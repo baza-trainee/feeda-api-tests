@@ -1,11 +1,21 @@
 import pytest
 import json
+from pydantic import ValidationError
+from models.user_project import (
+    #TODO Create model add partisipant admin panel
+    ParticipantUpdateDeleteResponse,
+    AllParticipantsResponse
+    #TODO Create partisipant get by id
+)
+
+
 
 
 class TestParticipantsPageOfTheAdminPanel:
 
     @pytest.mark.parametrize("first_name, last_name, speciality, phone_number, email, comment, account_discord,"
-                             " account_linkedin, city, experience, project, stack, status_code_for_create", [
+                             " account_linkedin, city, experience, project, stack, status_code_for_create",
+                             [
                                  # Test case 1: Invalid first_name (minlength - 1)
                                  pytest.param("A", "Doe", 1, "+380999999999", "a@example.com", "Comment", "a#1234",
                                               "https://www.linkedin.com/adoe",
@@ -184,6 +194,10 @@ class TestParticipantsPageOfTheAdminPanel:
         }
         response = user_project.add_participant(payload)
         assert response.status_code == status_code_for_create
+        # try:
+        #     LoginSuccessResponse(**response.json())
+        # except ValidationError as err:
+        #     pytest.fail(f"Response validation failed: {err}")
 
 
 
@@ -440,6 +454,10 @@ class TestParticipantsPageOfTheAdminPanel:
 
         response = user_project.update_participant(participant_id=participant_id, data=payload)
         assert response.status_code == status_code
+        try:
+            ParticipantUpdateDeleteResponse(**response.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
 
     def test_get_participant_by_id(self, user_project, participant):
         participant_id = self.get_id_participant(participant)
@@ -449,8 +467,17 @@ class TestParticipantsPageOfTheAdminPanel:
     def test_get_all_participant(self, user_project):
         response = user_project.get_participants_list()
         response.raise_for_status()
+        try:
+            AllParticipantsResponse(**response.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
+
 
     def test_delete(self, user_project, create_participant):
         participant_id = self.get_id_participant(create_participant)
         response_delete = user_project.delete_participant(participant_id=participant_id)
         response_delete.raise_for_status()
+        try:
+            ParticipantUpdateDeleteResponse(**response_delete.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
