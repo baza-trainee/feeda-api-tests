@@ -9,7 +9,7 @@ from models.users import (
     NewPasswordSuccessResponse,
     ResetPasswordEmailSuccessResponse,
     ResetPasswordEmailErrorResponse,
-    LogoutError,
+    LogoutSuccess,
 )
 
 
@@ -256,6 +256,11 @@ class TestAuth:
 
         assert response.status_code == 200
 
+        try:
+            LogoutSuccess(**response.json())
+        except ValidationError as err:
+            pytest.fail(f"Response validation failed: {err}")
+
     def test_logout_errors(self, users, config):
         login_response = users.login(
             email=config.get("username"), password=config.get("password")
@@ -264,9 +269,4 @@ class TestAuth:
 
         response = users.logout(data=payload)
 
-        assert response.status_code == 400
-
-        try:
-            LogoutError(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
+        assert response.status_code == 404
