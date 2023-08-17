@@ -4,11 +4,9 @@ from pydantic import ValidationError
 from models.user_project import (
     #TODO Create model add partisipant admin panel
     ParticipantUpdateDeleteResponse,
-    AllParticipantsResponse
+    AllParticipantsResponse,
     #TODO Create partisipant get by id
 )
-
-
 
 
 class TestParticipantsPageOfTheAdminPanel:
@@ -207,6 +205,8 @@ class TestParticipantsPageOfTheAdminPanel:
         participant_id = parsed_response.get("id")
         return participant_id
 
+
+
     @pytest.mark.parametrize(
         "first_name, last_name, speciality, phone_number, email, comment, account_discord, account_linkedin, city,"
         " experience, project, stack, status_code",
@@ -214,15 +214,15 @@ class TestParticipantsPageOfTheAdminPanel:
              pytest.param(
                  "Anna",
                  "Luzina",
-                 1,
+                 3,
                  "+380999999999",
                  "testing@gmail.com",
-                 "Valid comment",
-                 "anastasiia#1234",
+                 "string",
+                 "anastasiia",
                  "https://www.linkedin.com/in/anastasiia",
-                 "city",
-                 True,
-                 1,
+                 "string",
+                 False,
+                 [2, 3],
                  "QA Manual",
                  201,
                  id="test_change_valid_id"
@@ -231,7 +231,7 @@ class TestParticipantsPageOfTheAdminPanel:
              pytest.param(
                  "Anna",
                  "Luzina",
-                 1,
+                 3,
                  "+380999999999",
                  "testing@gmail.com",
                  "Valid comment",
@@ -239,7 +239,7 @@ class TestParticipantsPageOfTheAdminPanel:
                  "https://www.linkedin.com/in/anastasiia",
                  "city",
                  True,
-                 1,
+                 [2, 3],
                  "QA Manual",
                  201,
                  id="test_change_valid_last_name"
@@ -248,7 +248,7 @@ class TestParticipantsPageOfTheAdminPanel:
              pytest.param(
                  "Anna",
                  "Luzina",
-                 1,
+                 3,
                  "+380999999999",
                  "testing@gmail.com",
                  "Valid comment",
@@ -256,7 +256,7 @@ class TestParticipantsPageOfTheAdminPanel:
                  "https://www.linkedin.com/in/anastasiia",
                  "city",
                  True,
-                 1,
+                 [2, 3],
                  "QA Manual",
                  201,
                  id="test_change_valid_role"
@@ -265,7 +265,7 @@ class TestParticipantsPageOfTheAdminPanel:
              pytest.param(
                  "Anna",
                  "Luzina",
-                 1,
+                 3,
                  "+380999999999",
                  "testing@gmail.com",
                  "Valid comment",
@@ -273,7 +273,7 @@ class TestParticipantsPageOfTheAdminPanel:
                  "https://www.linkedin.com/in/anastasiia",
                  "city",
                  True,
-                 1,
+                 [2, 3],
                  "QA Manual",
                  201,
                  id="test_change_valid_phone_number"
@@ -282,7 +282,7 @@ class TestParticipantsPageOfTheAdminPanel:
              pytest.param(
                  "Anna",
                  "Luzina",
-                 1,
+                 3,
                  "+380999999999",
                  "testing@gmail.com",
                  "Valid comment",
@@ -290,7 +290,7 @@ class TestParticipantsPageOfTheAdminPanel:
                  "https://www.linkedin.com/in/anastasiia",
                  "city",
                  True,
-                 1,
+                 [2, 3],
                  "QA Manual",
                  201,
                  id="test_change_valid_email"
@@ -299,7 +299,7 @@ class TestParticipantsPageOfTheAdminPanel:
              pytest.param(
                  "Anna",
                  "Luzina",
-                 1,
+                 3,
                  "+380999999999",
                  "testing@gmail.com",
                  "Valid comment",
@@ -307,7 +307,7 @@ class TestParticipantsPageOfTheAdminPanel:
                  "https://www.linkedin.com/in/anastasiia",
                  "city",
                  True,
-                 1,
+                 [2, 3],
                  "QA Manual",
                  201,
                  id="test_change_valid_comment"
@@ -316,7 +316,7 @@ class TestParticipantsPageOfTheAdminPanel:
              pytest.param(
                  "Anna",
                  "Luzina",
-                 1,
+                 3,
                  "+380999999999",
                  "testing@gmail.com",
                  "Valid comment",
@@ -324,7 +324,7 @@ class TestParticipantsPageOfTheAdminPanel:
                  "https://www.linkedin.com/in/anastasiia",
                  "city",
                  True,
-                 1,
+                 [2, 3],
                  "QA Manual",
                  201,
                  id="test_change_valid_discord"
@@ -333,7 +333,7 @@ class TestParticipantsPageOfTheAdminPanel:
              pytest.param(
                  "Anna",
                  "Luzina",
-                 1,
+                 3,
                  "+380999999999",
                  "testing@gmail.com",
                  "Valid comment",
@@ -341,7 +341,7 @@ class TestParticipantsPageOfTheAdminPanel:
                  "https://www.linkedin.com/in/anastasiia",
                  "city",
                  True,
-                 1,
+                 [2, 3],
                  "QA Manual",
                  201,
                  id="test_change_valid_linkedin"
@@ -350,7 +350,7 @@ class TestParticipantsPageOfTheAdminPanel:
              pytest.param(
                  "Anna",
                  "Luzina",
-                 1,
+                 3,
                  "+380999999999",
                  "testing@gmail.com",
                  "Valid comment",
@@ -358,7 +358,7 @@ class TestParticipantsPageOfTheAdminPanel:
                  "https://www.linkedin.com/in/anastasiia",
                  "city",
                  True,
-                 1,
+                 [2, 3],
                  "QA Manual",
                  201,
                  id="test_change_valid_city"
@@ -367,7 +367,7 @@ class TestParticipantsPageOfTheAdminPanel:
              pytest.param(
                  "Anna",
                  "Luzina",
-                 1,
+                 3,
                  "+380999999999",
                  "testing@gmail.com",
                  "Valid comment",
@@ -375,7 +375,7 @@ class TestParticipantsPageOfTheAdminPanel:
                  "https://www.linkedin.com/in/anastasiia",
                  "city",
                  True,
-                 1,
+                 [2, 3],
                  "QA Manual",
                  201,
                  id="test_change_valid_experience"
@@ -384,7 +384,7 @@ class TestParticipantsPageOfTheAdminPanel:
              pytest.param(
                  "Anna",
                  "Luzina",
-                 1,
+                 3,
                  "+380999999999",
                  "testing@gmail.com",
                  "Valid comment",
@@ -392,7 +392,7 @@ class TestParticipantsPageOfTheAdminPanel:
                  "https://www.linkedin.com/in/anastasiia",
                  "city",
                  True,
-                 1,
+                 [2, 3],
                  "QA Manual",
                  201,
                  id="test_change_valid_project"
@@ -401,7 +401,7 @@ class TestParticipantsPageOfTheAdminPanel:
              pytest.param(
                  "Anna",
                  "Luzina",
-                 1,
+                 3,
                  "+380999999999",
                  "testing@gmail.com",
                  "Valid comment",
@@ -409,7 +409,7 @@ class TestParticipantsPageOfTheAdminPanel:
                  "https://www.linkedin.com/in/anastasiia",
                  "city",
                  True,
-                 1,
+                 [2, 3],
                  "QA Manual",
                  201,
                  id="test_change_valid_stack"
@@ -419,7 +419,7 @@ class TestParticipantsPageOfTheAdminPanel:
     def test_update_participant(
         self,
         user_project,
-        create_participant,
+        participant,
         first_name,
         last_name,
         speciality,
@@ -434,9 +434,8 @@ class TestParticipantsPageOfTheAdminPanel:
         stack,
         status_code,
     ):
-        participant_id = self.get_id_participant(create_participant)
-        payload = json.dumps(
-            {
+        participant_id = self.get_id_participant(participant)
+        payload = {
                 "first_name": first_name,
                 "last_name": last_name,
                 "speciality": speciality,
@@ -448,13 +447,13 @@ class TestParticipantsPageOfTheAdminPanel:
                 "city": city,
                 "experience": experience,
                 "project": project,
-                "stack": stack,
+                "stack": stack
             }
-        )
-
         response = user_project.update_participant(participant_id=participant_id, data=payload)
+        print(response.text)
         assert response.status_code == status_code
         try:
+
             ParticipantUpdateDeleteResponse(**response.json())
         except ValidationError as err:
             pytest.fail(f"Response validation failed: {err}")
@@ -473,10 +472,11 @@ class TestParticipantsPageOfTheAdminPanel:
             pytest.fail(f"Response validation failed: {err}")
 
 
-    def test_delete(self, user_project, create_participant):
-        participant_id = self.get_id_participant(create_participant)
+    def test_delete(self, user_project, participant):
+        participant_id = self.get_id_participant(participant)
         response_delete = user_project.delete_participant(participant_id=participant_id)
         response_delete.raise_for_status()
+        print(response_delete.json())
         try:
             ParticipantUpdateDeleteResponse(**response_delete.json())
         except ValidationError as err:

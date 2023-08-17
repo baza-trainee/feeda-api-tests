@@ -18,4 +18,4 @@ class DetailProjectResponse(BaseModel):
         str
     ] = None  # Assuming the format is a string representing a date
     address_site: Optional[str] = None  # Assuming the format is a URI string
-    url: str = Field(..., regex=r"^[-a-zA-Z0-9_]+$", max_length=30, min_length=1)
+    url: str = Field(..., max_length=30, min_length=1, pattern=r"^[-a-zA-Z0-9_]+$")

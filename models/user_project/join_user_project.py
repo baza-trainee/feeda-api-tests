@@ -2,6 +2,7 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from uuid import UUID
 import re
+from typing import List
 
 
 class JoinUserProjectResponse(BaseModel):
@@ -17,7 +18,7 @@ class JoinUserProjectResponse(BaseModel):
     conditions_participation: bool
     processing_personal_data: bool
     speciality: Optional[int] = None  # x-nullable
-    project: Optional[int] = None  # x-nullable
+    project: Optional[List[int]] = None  # x-nullable
     type_participant: Optional[int] = None  # x-nullable
 
     class Config:

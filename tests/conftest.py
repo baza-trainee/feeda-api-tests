@@ -42,28 +42,28 @@ def user_project(config, users):
     yield user_project_client
 
 
+# @pytest.fixture
+# def token():
+#     url = "http://localhost:8000/users/login/"
+#
+#     payload = json.dumps({
+#         "email": "admin123@gmail.com",
+#         "password": "Feeda12345"
+#     })
+#     headers = {
+#         'Content-Type': 'application/json'
+#     }
+#
+#     response = requests.request("POST", url, headers=headers, data=payload)
+#     assert response.status_code == 200
+#
+#     token = json.loads(response.content)["token"]
+#
+#     yield token
+
+
 @pytest.fixture
-def token():
-    url = "http://localhost:8000/users/login/"
-
-    payload = json.dumps({"email": "qafeeda123@gmail.com", "password": "BazaQA123"})
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Basic cWFmZWVkYTEyM0BnbWFpbC5jb206QmF6YVFBMTIz",
-    }
-
-    response = requests.request("POST", url, headers=headers, data=payload)
-    assert response.status_code == 200
-
-    token = json.loads(response.content)["token"]
-
-    yield token
-
-
-@pytest.fixture
-def project(token):
-    url = "http://localhost:8000/user-project/create-project/"
-
+def project(user_project):
     payload = json.dumps(
         {
             "title": "feeda",
@@ -77,21 +77,18 @@ def project(token):
             "url": "Unknown Type: slug",
         }
     )
-    headers = {"Authorization": "Token " + token, "Content-Type": "application/json"}
-
-    response = requests.request("POST", url, headers=headers, data=payload)
+    response = user_project.create_project(data=payload)
     yield response
-
+    parsed_response = response.json()
+    url = parsed_response.get("url")
+    user_project.project_delete(project_url=url)
 
 @pytest.fixture
-def participant(token):
-    url = "http://localhost:8000/user-project/add-participant/"
-
-    payload = json.dumps(
-        {
+def participant(user_project):
+    payload = {
             "first_name": "Anastasia",
             "last_name": "Luzina",
-            "speciality": 1,
+            "speciality": 3,
             "phone_number": "+380999999999",
             "email": "testing@gmail.com",
             "comment": "string",
@@ -99,12 +96,19 @@ def participant(token):
             "account_linkedin": "https://www.linkedin.com/in/anastasiia",
             "city": "string",
             "experience": False,
-            "project": 1,
-            "stack": "QA Manual",
+            "project": [
+                2,
+                3
+            ],
+            "stack": "QA Manual"
         }
-    )
-    headers = {"Authorization": "Token " + token, "Content-Type": "application/json"}
 
-    response = requests.request("POST", url, headers=headers, data=payload)
+    response = user_project.add_participant(data=payload)
+
 
     yield response
+
+    parsed_response = response.json()
+    participant_id = parsed_response.get("id")
+
+    user_project.delete_participant(participant_id=participant_id)
