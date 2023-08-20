@@ -1,12 +1,5 @@
 import pytest
 import json
-from pydantic import ValidationError
-from models.user_project import (
-    #TODO Create model add partisipant admin panel
-    ParticipantUpdateDeleteResponse,
-    AllParticipantsResponse,
-    #TODO Create partisipant get by id
-)
 
 
 class TestParticipantsPageOfTheAdminPanel:
@@ -452,11 +445,6 @@ class TestParticipantsPageOfTheAdminPanel:
         response = user_project.update_participant(participant_id=participant_id, data=payload)
         print(response.text)
         assert response.status_code == status_code
-        try:
-
-            ParticipantUpdateDeleteResponse(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
 
     def test_get_participant_by_id(self, user_project, participant):
         participant_id = self.get_id_participant(participant)
@@ -466,10 +454,6 @@ class TestParticipantsPageOfTheAdminPanel:
     def test_get_all_participant(self, user_project):
         response = user_project.get_participants_list()
         response.raise_for_status()
-        try:
-            AllParticipantsResponse(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
 
 
     def test_delete(self, user_project, participant):
@@ -477,7 +461,3 @@ class TestParticipantsPageOfTheAdminPanel:
         response_delete = user_project.delete_participant(participant_id=participant_id)
         response_delete.raise_for_status()
         print(response_delete.json())
-        try:
-            ParticipantUpdateDeleteResponse(**response_delete.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")

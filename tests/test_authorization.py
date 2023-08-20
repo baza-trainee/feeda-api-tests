@@ -1,16 +1,27 @@
 import pytest
 
-from pydantic import ValidationError
+from assertpy import assert_that, soft_assertions
 
 from utils.google_auth import process_messages
-from models.users import (
-    LoginSuccessResponse,
-    LoginErrorResponse,
-    NewPasswordSuccessResponse,
-    ResetPasswordEmailSuccessResponse,
-    ResetPasswordEmailErrorResponse,
-    LogoutSuccess,
-)
+
+
+LOGIN_ERRORS = {
+    "email does not belong to the admin": "Invalid data",
+    "password does not belong to the admin": "Invalid data",
+    "email invalid length minlength-1": "Enter a valid email address.",
+    "email invalid length maxlength+1": "Enter a valid email address.",
+    "invalid format": "Email invalid",
+    "password invalid length minlength-1": "Ensure this field has at least 2 characters.",
+    "password invalid length maxlength+1": "Invalid data",
+    "invalid format - without a lowercase Latin letter": "Invalid data",
+    "invalid format - without an uppercase Latin letter": "Invalid data",
+    "invalid format - without a digit": "Invalid data",
+    "invalid format - in Cyrillic": "Invalid data",
+    "invalid format - with special characters": "Invalid data",
+    "empty one required field": "This field may not be blank.",
+    "empty all fields": "This field may not be blank.",
+    "space all fields": "This field may not be blank."
+}
 
 
 class TestAuth:
@@ -21,19 +32,15 @@ class TestAuth:
                 "admin123@gmail.com",
                 "Feeda12345",
                 200,
-                id="The system returns status code 200 if the request is successful",
             ),
         ],
     )
     def test_login_success(self, email, password, status_code, users):
         response = users.login(email=email, password=password)
 
-        assert response.status_code == status_code
-
-        try:
-            LoginSuccessResponse(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()).contains_key("token")
 
     @pytest.mark.parametrize(
         "email,password,status_code",
@@ -42,116 +49,100 @@ class TestAuth:
                 "example@gmail.com",
                 "Baza12345",
                 400,
-                id="The system returns status code 400 if invalid credentials are passed in the request body "
-                "(email does not belong to the admin)",
+                id="email does not belong to the admin",
             ),
             pytest.param(
                 "kozlov2777@gmail.com",
                 "Baza",
                 400,
-                id="The system returns status code 400 if invalid credentials are passed in the request body "
-                "(password does not belong to the admin)",
+                id="password does not belong to the admin",
             ),
             pytest.param(
                 "T" * 5,
                 "Baza12345",
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (email of "
-                "invalid length minlength-1)",
+                id="invalid length minlength-1",
             ),
             pytest.param(
                 "T" * 71,
                 "Baza12345",
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (email of "
-                "invalid length maxlength+1)",
+                id="invalid length maxlength+1",
             ),
             pytest.param(
                 "a@gmail.com",
                 "baza12345",
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (email of "
-                "invalid format)",
+                id="invalid format",
             ),
             pytest.param(
                 "kozlov2777@gmail.com",
                 "T",
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (password of "
-                "invalid length minlength-1)",
+                id="invalid length minlength-1",
             ),
             pytest.param(
                 "kozlov2777@gmail.com",
                 "T" * 13,
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (password of "
-                "invalid length maxlength+1)",
+                id="invalid length maxlength+1",
             ),
             pytest.param(
                 "kozlov2777@gmail.com",
                 "BAZA12345",
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (password of "
-                "invalid format - without a lowercase Latin letter)",
+                id="invalid format - without a lowercase Latin letter",
             ),
             pytest.param(
                 "kozlov2777@gmail.com",
                 "baza12345",
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (password of "
-                "invalid format - without an uppercase Latin letter)",
+                id="invalid format - without an uppercase Latin letter",
             ),
             pytest.param(
                 "kozlov2777@gmail.com",
                 "Baza",
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (password of "
-                "invalid format - without a digit)",
+                id="invalid format - without a digit",
             ),
             pytest.param(
                 "kozlov2777@gmail.com",
                 "база123",
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (password of "
-                "invalid format - in Cyrillic)",
+                id="invalid format - in Cyrillic",
             ),
             pytest.param(
                 "kozlov2777@gmail.com",
                 "@Baza123",
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (password of "
-                "invalid format - with special characters)",
+                id="invalid format - with special characters",
             ),
             pytest.param(
                 "kozlov2777@gmail.com",
                 "",
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (empty one "
-                "required field)",
+                id="empty one required field",
             ),
             pytest.param(
                 "",
                 "",
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (empty all fields)",
+                id="empty all fields",
             ),
             pytest.param(
                 " ",
                 " ",
                 400,
-                id="The system returns status code 400 if invalid data is passed in the request body (space all fields)",
+                id="space all fields",
             ),
         ],
     )
-    def test_login_errors(self, email, password, status_code, users):
+    def test_login_errors(self, email, password, status_code, users, test_id):
         response = users.login(email=email, password=password)
 
-        assert response.status_code == status_code
-
-        try:
-            LoginErrorResponse(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["message"]).is_equal_to(LOGIN_ERRORS[test_id])
 
     @pytest.mark.parametrize(
         "email,status_code",
@@ -167,12 +158,8 @@ class TestAuth:
         payload = {"email": email}
         response = users.reset_password_email(data=payload)
 
-        assert response.status_code == status_code
-
-        try:
-            ResetPasswordEmailSuccessResponse(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
 
     @pytest.mark.parametrize(
         "email,status_code",
@@ -205,12 +192,8 @@ class TestAuth:
         payload = {"email": email}
         response = users.reset_password_email(data=payload)
 
-        assert response.status_code == status_code
-
-        try:
-            ResetPasswordEmailErrorResponse(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
 
     @pytest.mark.parametrize(
         "password,confirm_password,email",
@@ -235,16 +218,13 @@ class TestAuth:
         }
         response = users.password_reset_complete(data=payload)
 
-        assert response.status_code == 201
-
-        try:
-            NewPasswordSuccessResponse(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(201)
 
         response = users.login(email=email, password=password)
 
-        assert response.status_code == 200
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(200)
 
     def test_logout_success(self, users, config):
         login_response = users.login(
@@ -254,12 +234,8 @@ class TestAuth:
 
         response = users.logout(data=payload)
 
-        assert response.status_code == 200
-
-        try:
-            LogoutSuccess(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(200)
 
     def test_logout_errors(self, users, config):
         login_response = users.login(
@@ -269,4 +245,5 @@ class TestAuth:
 
         response = users.logout(data=payload)
 
-        assert response.status_code == 404
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(404)

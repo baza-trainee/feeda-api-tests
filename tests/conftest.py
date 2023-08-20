@@ -42,6 +42,11 @@ def user_project(config, users):
     yield user_project_client
 
 
+@pytest.fixture
+def test_id(request):
+    yield request.node.callspec.id
+
+
 # @pytest.fixture
 # def token():
 #     url = "http://localhost:8000/users/login/"

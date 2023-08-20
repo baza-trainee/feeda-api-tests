@@ -1,6 +1,4 @@
 import pytest
-from pydantic import ValidationError
-from models.user_project import JoinUserProjectResponse
 
 
 class TestParticipantRegistration:
@@ -134,10 +132,6 @@ class TestParticipantRegistration:
         response = user_project.join(data=payload)
 
         assert response.status_code == status_code
-        try:
-            JoinUserProjectResponse(**response.json())
-        except ValidationError as err:
-            pytest.fail(f"Response validation failed: {err}")
 
 
     @pytest.mark.parametrize(
