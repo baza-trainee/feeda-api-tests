@@ -20,10 +20,10 @@ class TestProjectAdminPanel:
                     "project_status": 1,  # Project status (1 for Active, 2 for Completed, 3 for On Hold)
                     "start_date_project": "2023-08-15",  # Start date of the project
                     "end_date_project": "2023-12-31",  # Expected end date of the project
-                    "address_site": "https://www.example.com"  # Website address
+                    "address_site": "https://www.example.com",  # Website address
                 },
                 201,
-                id="test_valid_project_data"
+                id="test_valid_project_data",
             ),
             # Test case 2: Invalid type_project (system should return 400)
             pytest.param(
@@ -35,10 +35,10 @@ class TestProjectAdminPanel:
                     "project_status": 1,
                     "start_date_project": "2023-09-01",
                     "end_date_project": "2023-12-15",
-                    "address_site": "https://www.mobileapp.com"
+                    "address_site": "https://www.mobileapp.com",
                 },
                 400,
-                id="test_invalid_type_project"
+                id="test_invalid_type_project",
             ),
             # Test case 3: Empty title (system should return 400)
             pytest.param(
@@ -50,10 +50,10 @@ class TestProjectAdminPanel:
                     "project_status": 1,
                     "start_date_project": "2023-08-15",
                     "end_date_project": "2023-09-30",
-                    "address_site": "https://www.example.com"
+                    "address_site": "https://www.example.com",
                 },
                 400,
-                id="test_empty_title"
+                id="test_empty_title",
             ),
             # Test case 4: Missing end_date_project (system should return 400)
             pytest.param(
@@ -64,10 +64,10 @@ class TestProjectAdminPanel:
                     "complexity": 2,
                     "project_status": 1,
                     "start_date_project": "2023-07-01",
-                    "address_site": "https://www.dataanalysis.com"
+                    "address_site": "https://www.dataanalysis.com",
                 },
                 400,
-                id="test_missing_end_date_project"
+                id="test_missing_end_date_project",
             ),
             # Test case 5: Invalid start_date_project format (system should return 400)
             pytest.param(
@@ -79,10 +79,10 @@ class TestProjectAdminPanel:
                     "project_status": 1,
                     "start_date_project": "07-16-2023",  # Invalid date format (should be YYYY-MM-DD)
                     "end_date_project": "2023-08-31",
-                    "address_site": "https://www.testingproject.com"
+                    "address_site": "https://www.testingproject.com",
                 },
                 400,
-                id="test_invalid_start_date_format"
+                id="test_invalid_start_date_format",
             ),
             # Test case 6: End date before start date (system should return 400)
             pytest.param(
@@ -94,10 +94,10 @@ class TestProjectAdminPanel:
                     "project_status": 1,
                     "start_date_project": "2023-09-30",
                     "end_date_project": "2023-08-15",  # End date before start date
-                    "address_site": "https://www.marketingcampaign.com"
+                    "address_site": "https://www.marketingcampaign.com",
                 },
                 400,
-                id="test_end_date_before_start_date"
+                id="test_end_date_before_start_date",
             ),
             # Test case 7: Missing address_site (system should return 400)
             pytest.param(
@@ -111,9 +111,9 @@ class TestProjectAdminPanel:
                     "end_date_project": "2024-03-31",
                 },
                 400,
-                id="test_missing_address_site"
-            )
-        ]
+                id="test_missing_address_site",
+            ),
+        ],
     )
     def test_create_project(
         self,
@@ -129,17 +129,15 @@ class TestProjectAdminPanel:
         status_code,
     ):
         payload = {
-                "title": title,
-                "comment": comment,
-                "type_project": type_project,
-                "complexity": complexity,
-                "project_status": project_status,
-                "start_date_project": start_date_project,
-                "end_date_project": end_date_project,
-                "address_site": address_site,
-            }
-
-
+            "title": title,
+            "comment": comment,
+            "type_project": type_project,
+            "complexity": complexity,
+            "project_status": project_status,
+            "start_date_project": start_date_project,
+            "end_date_project": end_date_project,
+            "address_site": address_site,
+        }
 
         response = user_project.create_project(data=payload)
         assert response.status_code == status_code
@@ -163,12 +161,9 @@ class TestProjectAdminPanel:
         return url
 
     def test_add_participant_to_project(self, user_project, project, participant):
-
         payload = json.dumps(
             {
-                "user": [
-                    self.get_id_participant(participant=participant)
-                ],
+                "user": [self.get_id_participant(participant=participant)],
                 "project": self.get_id_project(project=project),
             }
         )
@@ -183,15 +178,11 @@ class TestProjectAdminPanel:
         response = user_project.projects_list()
         assert response.raise_for_status()
 
-    #TODO Тут помилка, зробити баг репорт!!
+    # TODO Тут помилка, зробити баг репорт!!
     def test_update_team(self, user_project, project, participant):
-
-
         payload = json.dumps(
             {
-                "user": [
-                    self.get_id_participant(participant=participant)
-                ],
+                "user": [self.get_id_participant(participant=participant)],
                 "project": {
                     "title": "string",
                     "start_date_project": "2023-07-18",
@@ -199,7 +190,9 @@ class TestProjectAdminPanel:
                 },
             }
         )
-        response = user_project.command_update(cmd_id=self.get_id_project(project=project), data=payload)
+        response = user_project.command_update(
+            cmd_id=self.get_id_project(project=project), data=payload
+        )
         assert response.raise_for_status()
 
     @pytest.mark.parametrize(
@@ -219,10 +212,10 @@ class TestProjectAdminPanel:
                     "comment": "Revised research goals and approach.",
                     "start_date_project": "2023-08-15",
                     "end_date_project": "2024-01-31",
-                    "address_site": "https://www.updatedresearch.com"
+                    "address_site": "https://www.updatedresearch.com",
                 },
                 200,
-                id="test_valid_project_change_data"
+                id="test_valid_project_change_data",
             ),
             # Test case 2: Invalid project status (system should return 400)
             pytest.param(
@@ -237,10 +230,10 @@ class TestProjectAdminPanel:
                     "comment": "Making adjustments based on feedback.",
                     "start_date_project": "2023-09-01",
                     "end_date_project": "2023-12-15",
-                    "address_site": "https://www.projectupdate.com"
+                    "address_site": "https://www.projectupdate.com",
                 },
                 400,
-                id="test_invalid_project_status"
+                id="test_invalid_project_status",
             ),
             # Test case 3: Empty title (system should return 400)
             pytest.param(
@@ -255,10 +248,10 @@ class TestProjectAdminPanel:
                     "comment": "No title provided for the updated project.",
                     "start_date_project": "2023-08-15",
                     "end_date_project": "2023-10-31",
-                    "address_site": "https://www.updatedproject.com"
+                    "address_site": "https://www.updatedproject.com",
                 },
                 400,
-                id="test_empty_title"
+                id="test_empty_title",
             ),
             # Test case 4: Missing email (system should return 400)
             pytest.param(
@@ -272,10 +265,10 @@ class TestProjectAdminPanel:
                     "comment": "Revised data analysis plan.",
                     "start_date_project": "2023-07-01",
                     "end_date_project": "2023-09-30",
-                    "address_site": "https://www.dataanalysis.com"
+                    "address_site": "https://www.dataanalysis.com",
                 },
                 400,
-                id="test_missing_email"
+                id="test_missing_email",
             ),
             # Test case 5: Invalid end_date_project format (system should return 400)
             pytest.param(
@@ -290,10 +283,10 @@ class TestProjectAdminPanel:
                     "comment": "Revised testing approach.",
                     "start_date_project": "2023-08-01",
                     "end_date_project": "16-07-2023",
-                    "address_site": "https://www.testingprojectupdate.com"
+                    "address_site": "https://www.testingprojectupdate.com",
                 },
                 400,
-                id="test_invalid_end_date_format"
+                id="test_invalid_end_date_format",
             ),
             # Test case 6: End date before start date (system should return 400)
             pytest.param(
@@ -308,10 +301,10 @@ class TestProjectAdminPanel:
                     "comment": "Revised marketing strategy.",
                     "start_date_project": "2023-10-01",
                     "end_date_project": "2023-08-15",
-                    "address_site": "https://www.marketingcampaignupdate.com"
+                    "address_site": "https://www.marketingcampaignupdate.com",
                 },
                 400,
-                id="test_end_date_before_start_date"
+                id="test_end_date_before_start_date",
             ),
             # Test case 7: Missing address_site (system should return 400)
             pytest.param(
@@ -328,9 +321,9 @@ class TestProjectAdminPanel:
                     "end_date_project": "2024-03-31",
                 },
                 400,
-                id="test_missing_address_site"
-            )
-        ]
+                id="test_missing_address_site",
+            ),
+        ],
     )
     def test_update_project(
         self,
@@ -365,9 +358,13 @@ class TestProjectAdminPanel:
             }
         )
 
-        response = user_project.project_update(project_url=self.get_url(project=project), data=payload)
+        response = user_project.project_update(
+            project_url=self.get_url(project=project), data=payload
+        )
         assert response.status_code == status_code
 
     def test_delete_project(self, project, user_project):
-        response = user_project.project_delete(project_url=self.get_url(project=project))
+        response = user_project.project_delete(
+            project_url=self.get_url(project=project)
+        )
         assert response.raise_for_status()

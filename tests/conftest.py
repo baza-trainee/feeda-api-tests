@@ -1,11 +1,26 @@
 import json
 import pytest
-import requests
 import configparser
 import os
+import subprocess
+import pytest
 
 from api.users import Users
 from api.user_project import UserProject
+
+
+def run_tests():
+    pytest.main(["-v", "--alluredir=allure-results", "tests"])
+
+
+def generate_allure_report():
+    subprocess.run(
+        ["allure", "generate", "allure-results", "--clean", "-o", "allure-report"]
+    )
+
+
+def serve_allure_report():
+    subprocess.run(["allure", "serve", "allure-results"])
 
 
 @pytest.fixture(scope="session")
@@ -88,28 +103,25 @@ def project(user_project):
     url = parsed_response.get("url")
     user_project.project_delete(project_url=url)
 
+
 @pytest.fixture
 def participant(user_project):
     payload = {
-            "first_name": "Anastasia",
-            "last_name": "Luzina",
-            "speciality": 3,
-            "phone_number": "+380999999999",
-            "email": "testing@gmail.com",
-            "comment": "string",
-            "account_discord": "anastasiia",
-            "account_linkedin": "https://www.linkedin.com/in/anastasiia",
-            "city": "string",
-            "experience": False,
-            "project": [
-                2,
-                3
-            ],
-            "stack": "QA Manual"
-        }
+        "first_name": "Anastasia",
+        "last_name": "Luzina",
+        "speciality": 3,
+        "phone_number": "+380999999999",
+        "email": "testing@gmail.com",
+        "comment": "string",
+        "account_discord": "anastasiia",
+        "account_linkedin": "https://www.linkedin.com/in/anastasiia",
+        "city": "string",
+        "experience": False,
+        "project": [2, 3],
+        "stack": "QA Manual",
+    }
 
     response = user_project.add_participant(data=payload)
-
 
     yield response
 

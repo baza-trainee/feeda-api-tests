@@ -1,5 +1,6 @@
 import requests
 import logging
+import allure
 
 from utils.logger import log_response
 
@@ -13,6 +14,7 @@ class UserProject:
             "Authorization": f"Token {self.token}",
         }
 
+    @allure.step("Add participant")
     def add_participant(self, data: dict) -> requests.Response:
         url = f"{self.base_url}/user-project/add-participant/"
 
@@ -31,6 +33,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Delete command")
     def command_delete(self, cmd_id: str) -> requests.Response:
         url = f"{self.base_url}/user-project/command-delete/{cmd_id}/"
 
@@ -48,6 +51,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Update command")
     def command_update(self, cmd_id: str, data: dict) -> requests.Response:
         url = f"{self.base_url}/user-project/command-update/{cmd_id}/"
 
@@ -66,6 +70,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Create command")
     def create_command(self, data: dict) -> requests.Response:
         url = f"{self.base_url}/user-project/command/"
 
@@ -84,6 +89,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Get commands")
     def get_commands(self) -> requests.Response:
         url = f"{self.base_url}/user-project/commands/"
 
@@ -101,6 +107,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Create project")
     def create_project(self, data: dict) -> requests.Response:
         url = f"{self.base_url}/user-project/create-project/"
 
@@ -119,6 +126,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Filter participant")
     def filter_participant(self) -> requests.Response:
         url = f"{self.base_url}/user-project/filter-participant/"
 
@@ -137,6 +145,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Filter project")
     def filter_project(self) -> requests.Response:
         url = f"{self.base_url}/user-project/filter-project/"
 
@@ -155,6 +164,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Get participant")
     def get_participant(self, participant_id: str) -> requests.Response:
         url = f"{self.base_url}/user-project/get-participant/{participant_id}/"
 
@@ -173,6 +183,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Join")
     def join(self, data: dict) -> requests.Response:
         url = f"{self.base_url}/user-project/join/"
 
@@ -191,6 +202,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Update participant")
     def update_participant(self, participant_id: str, data: dict) -> requests.Response:
         url = f"{self.base_url}/user-project/participant-detail/{participant_id}/"
 
@@ -209,6 +221,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Delete participant")
     def delete_participant(self, participant_id: str) -> requests.Response:
         url = f"{self.base_url}/user-project/participant-detail/{participant_id}/"
 
@@ -227,6 +240,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Get participants list")
     def get_participants_list(self) -> requests.Response:
         url = f"{self.base_url}/user-project/participants-list/"
 
@@ -244,6 +258,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Read project")
     def project_read(self, project_url: str) -> requests.Response:
         url = f"{self.base_url}/user-project/project/{project_url}/"
 
@@ -262,6 +277,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Update project")
     def project_update(self, project_url: str, data: dict) -> requests.Response:
         url = f"{self.base_url}/user-project/project/{project_url}/"
 
@@ -280,6 +296,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Delete project")
     def project_delete(self, project_url: str) -> requests.Response:
         url = f"{self.base_url}/user-project/project/{project_url}/"
 
@@ -298,6 +315,7 @@ class UserProject:
 
         return response
 
+    @allure.step("List projects")
     def projects_list(self) -> requests.Response:
         url = f"{self.base_url}/user-project/projects/"
 
@@ -315,6 +333,7 @@ class UserProject:
 
         return response
 
+    @allure.step("Send read")
     def send_read(self, user_id: str) -> requests.Response:
         url = f"{self.base_url}/user-project/send/{user_id}/"
 
