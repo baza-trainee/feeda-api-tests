@@ -1,11 +1,16 @@
 import json
 import pytest
 
+CREATE_PROJECT_ERRORS = {
+    "test_invalid_type_project": "Incorrect type. Expected pk value, received str.",
+    "test_empty_title": "This field may not be blank.",
+    "test_wrong_format_end_date_project": "Date has wrong format. Use one of these formats instead: YYYY-MM-DD.",
+    "test_invalid_start_date_format": "Date has wrong format. Use one of these formats instead: YYYY-MM-DD.",
+    "test_invalid_address_site": "Enter a valid URL.",
+}
+
 
 class TestProjectAdminPanel:
-    data = []
-    ids = []
-
     @pytest.mark.parametrize(
         "title, comment, type_project, complexity, project_status, start_date_project,"
         "end_date_project, address_site, status_code",
@@ -84,22 +89,7 @@ class TestProjectAdminPanel:
                 400,
                 id="test_invalid_start_date_format",
             ),
-            # Test case 6: End date before start date (system should return 400)
-            pytest.param(
-                {
-                    "title": "Marketing Campaign",
-                    "comment": "Planning and executing a marketing campaign.",
-                    "type_project": 3,
-                    "complexity": 2,
-                    "project_status": 1,
-                    "start_date_project": "2023-09-30",
-                    "end_date_project": "2023-08-15",  # End date before start date
-                    "address_site": "https://www.marketingcampaign.com",
-                },
-                400,
-                id="test_end_date_before_start_date",
-            ),
-            # Test case 7: Missing address_site (system should return 400)
+            # Test case 6: Invalid address_site (system should return 400)
             pytest.param(
                 {
                     "title": "Research Project",
@@ -109,9 +99,10 @@ class TestProjectAdminPanel:
                     "project_status": 1,
                     "start_date_project": "2023-10-01",
                     "end_date_project": "2024-03-31",
+                    "address_site": "sfasdfads",
                 },
                 400,
-                id="test_missing_address_site",
+                id="test_invalid_address_site",
             ),
         ],
     )

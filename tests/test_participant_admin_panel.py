@@ -1,6 +1,34 @@
 import pytest
 import json
 
+CREATE_PARTICIPANT_ERRORS = {
+    "test_invalid_first_name_min_length": "Ensure this field has at least 2 characters.",
+    "test_invalid_first_name_max_length": "Ensure this field has no more than 20 characters.",
+    "test_invalid_first_name_null": "This field may not be null.",
+    "test_invalid_last_name_min_length": "Ensure this field has at least 2 characters.",
+    "test_invalid_last_name_max_length": "Ensure this field has no more than 20 characters.",
+    "test_invalid_last_name_null": "This field may not be null.",
+    "test_invalid_speciality_null": "This field may not be null.",
+    "test_invalid_phone_number_min_length": "The phone number entered is not valid.",
+    "test_invalid_phone_number_max_length": "The phone number entered is not valid.",
+    "test_invalid_phone_number_null": "This field may not be null.",
+    "test_invalid_email_min_length": "Enter a valid email address.",
+    "test_invalid_email_max_length": "Enter a valid email address.",
+    "test_invalid_email_null": "This field may not be null.",
+    "test_invalid_email_format": "Enter a valid email address.",
+    "test_invalid_discord_min_length": "Ensure this field has at least 7 characters.",
+    "test_invalid_discord_max_length": "Ensure this field has no more than 37 characters.",
+    "test_invalid_discord_null": "This field may not be null.",
+    "test_invalid_city_min_length": "Ensure this field has at least 2 characters.",
+    "test_invalid_city_max_length": "Ensure this field has no more than 50 characters.",
+    "test_invalid_city_null": "This field may not be null.",
+    "test_invalid_experience_null": "This field may not be null.",
+    "test_invalid_stack_min_length": "Ensure this field has at least 2 characters.",
+    "test_invalid_stack_max_length": "Ensure this field has no more than 300 characters.",
+    "test_invalid_stack_null": "This field may not be null.",
+    "test_adding_to_nonexistent_project": "Invalid pk \"1000\" - object does not exist.",
+}
+
 
 class TestParticipantsPageOfTheAdminPanel:
     @pytest.mark.parametrize(
