@@ -1,5 +1,34 @@
 import pytest
-import json
+
+from assertpy import assert_that, soft_assertions
+
+CREATE_PARTICIPANT_ERRORS = {
+    "test_invalid_first_name_min_length": "Ensure this field has at least 2 characters.",
+    "test_invalid_first_name_max_length": "",
+    "test_invalid_first_name_null": "This field may not be null.",
+    "test_invalid_last_name_min_length": "Ensure this field has at least 2 characters.",
+    "test_invalid_last_name_max_length": "",
+    "test_invalid_last_name_null": "This field may not be null.",
+    "test_invalid_speciality_null": "",
+    "test_invalid_phone_number_min_length": "The phone number entered is not valid.",
+    "test_invalid_phone_number_max_length": "The phone number entered is not valid.",
+    "test_invalid_phone_number_null": "This field may not be null.",
+    "test_invalid_email_min_length": "Enter a valid email address.",
+    "test_invalid_email_max_length": "Enter a valid email address.",
+    "test_invalid_email_null": "This field may not be null.",
+    "test_invalid_email_format": "Enter a valid email address.",
+    "test_invalid_discord_min_length": "Ensure this field has at least 7 characters.",
+    "test_invalid_discord_max_length": "",
+    "test_invalid_discord_null": "This field may not be null.",
+    "test_invalid_city_min_length": "Ensure this field has at least 2 characters.",
+    "test_invalid_city_max_length": "",
+    "test_invalid_city_null": "This field may not be null.",
+    "test_invalid_experience_null": "This field may not be null.",
+    "test_invalid_stack_min_length": "Ensure this field has at least 2 characters.",
+    "test_invalid_stack_max_length": "",
+    "test_invalid_stack_null": "This field may not be null.",
+    "test_adding_to_nonexistent_project": "Invalid pk \"1000\" - object does not exist.",
+}
 
 
 class TestParticipantsPageOfTheAdminPanel:
@@ -147,12 +176,12 @@ class TestParticipantsPageOfTheAdminPanel:
                                  # Test case 25: Adding participant to non-existent project
                                  pytest.param("David", "Smith", 1, "+380999999999", "david@example.com", "Comment",
                                               "david#5678",
-                                              "https://www.linkedin.com/davidsmith", "New York", True, 1, "Regular",
+                                              "https://www.linkedin.com/davidsmith", "New York", True, 1000, "Regular",
                                               400,
                                               id="test_adding_to_nonexistent_project"),
                              ]
                              )
-    def test_create_participant(
+    def test_create_participant_errors(
             self,
             user_project,
             first_name,
@@ -168,6 +197,7 @@ class TestParticipantsPageOfTheAdminPanel:
             project,
             stack,
             status_code_for_create,
+            test_id
     ):
         payload = {
             "first_name": first_name,
@@ -184,11 +214,9 @@ class TestParticipantsPageOfTheAdminPanel:
             "stack": stack
         }
         response = user_project.add_participant(payload)
-        assert response.status_code == status_code_for_create
-        # try:
-        #     LoginSuccessResponse(**response.json())
-        # except ValidationError as err:
-        #     pytest.fail(f"Response validation failed: {err}")
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code_for_create)
+            assert_that(response.json()["message"]).is_equal_to(CREATE_PARTICIPANT_ERRORS[test_id])
 
 
 
@@ -443,8 +471,8 @@ class TestParticipantsPageOfTheAdminPanel:
                 "stack": stack
             }
         response = user_project.update_participant(participant_id=participant_id, data=payload)
-        print(response.text)
-        assert response.status_code == status_code
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
 
     def test_get_participant_by_id(self, user_project, participant):
         participant_id = self.get_id_participant(participant)
@@ -460,4 +488,4 @@ class TestParticipantsPageOfTheAdminPanel:
         participant_id = self.get_id_participant(participant)
         response_delete = user_project.delete_participant(participant_id=participant_id)
         response_delete.raise_for_status()
-        print(response_delete.json())
+

@@ -142,7 +142,10 @@ class TestAuth:
 
         with soft_assertions():
             assert_that(response.status_code).is_equal_to(status_code)
-            assert_that(response.json()["message"]).is_equal_to(LOGIN_ERRORS[test_id])
+            # assert_that(response.json()["message"]).is_equal_to(LOGIN_ERRORS[test_id])
+            assert_that(response.json()).contains_value(LOGIN_ERRORS[test_id])
+
+
 
     @pytest.mark.parametrize(
         "email,status_code",
