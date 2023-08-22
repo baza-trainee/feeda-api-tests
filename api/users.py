@@ -1,5 +1,6 @@
 import requests
 import logging
+import allure
 
 from utils.logger import log_response
 
@@ -9,6 +10,7 @@ class Users:
         self.base_url = config.get("base_url")
         self.headers = {"Content-Type": "application/json"}
 
+    @allure.step("Login")
     def login(self, email: str, password: str) -> requests.Response:
         url = f"{self.base_url}/users/login/"
         data = {"email": email, "password": password}
@@ -28,6 +30,7 @@ class Users:
 
         return response
 
+    @allure.step("Logout")
     def logout(self, data: dict) -> requests.Response:
         url = f"{self.base_url}/users/logout/"
 
@@ -46,6 +49,7 @@ class Users:
 
         return response
 
+    @allure.step("Complete password reset")
     def password_reset_complete(self, data: dict) -> requests.Response:
         url = f"{self.base_url}/users/password-reset-complete/"
 
@@ -63,6 +67,7 @@ class Users:
 
         return response
 
+    @allure.step("Verify password reset")
     def password_reset_verify(self, uidb64: str, token: str) -> requests.Response:
         url = f"{self.base_url}/users/password-reset/{uidb64}/{token}/"
 
@@ -80,6 +85,7 @@ class Users:
 
         return response
 
+    @allure.step("Reset password email")
     def reset_password_email(self, data: dict) -> requests.Response:
         url = f"{self.base_url}/users/reset-password-email/"
 

@@ -20,7 +20,7 @@ LOGIN_ERRORS = {
     "invalid format - with special characters": "Invalid data",
     "empty one required field": "This field may not be blank.",
     "empty all fields": "This field may not be blank.",
-    "space all fields": "This field may not be blank."
+    "space all fields": "This field may not be blank.",
 }
 
 
