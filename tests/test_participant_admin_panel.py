@@ -1,5 +1,5 @@
 import pytest
-import json
+from assertpy import assert_that, soft_assertions
 
 CREATE_PARTICIPANT_ERRORS = {
     "test_invalid_first_name_min_length": "Ensure this field has at least 2 characters.",
@@ -8,12 +8,12 @@ CREATE_PARTICIPANT_ERRORS = {
     "test_invalid_last_name_min_length": "Ensure this field has at least 2 characters.",
     "test_invalid_last_name_max_length": "Ensure this field has no more than 20 characters.",
     "test_invalid_last_name_null": "This field may not be null.",
-    "test_invalid_speciality_null": "This field may not be null.",
+    "test_invalid_speciality_str": "Incorrect type. Expected pk value, received str.",
     "test_invalid_phone_number_min_length": "The phone number entered is not valid.",
     "test_invalid_phone_number_max_length": "The phone number entered is not valid.",
     "test_invalid_phone_number_null": "This field may not be null.",
     "test_invalid_email_min_length": "Enter a valid email address.",
-    "test_invalid_email_max_length": "Enter a valid email address.",
+    "test_invalid_email_max_length": "Ensure this field has no more than 70 characters.",
     "test_invalid_email_null": "This field may not be null.",
     "test_invalid_email_format": "Enter a valid email address.",
     "test_invalid_discord_min_length": "Ensure this field has at least 7 characters.",
@@ -33,7 +33,7 @@ CREATE_PARTICIPANT_ERRORS = {
 class TestParticipantsPageOfTheAdminPanel:
     @pytest.mark.parametrize(
         "first_name, last_name, speciality, phone_number, email, comment, account_discord,"
-        " account_linkedin, city, experience, project, stack, status_code_for_create",
+        " account_linkedin, city, experience, project, stack, type_participant, status_code",
         [
             # Test case 1: Invalid first_name (minlength - 1)
             pytest.param(
@@ -43,18 +43,19 @@ class TestParticipantsPageOfTheAdminPanel:
                 "+380999999999",
                 "a@example.com",
                 "Comment",
-                "a#1234",
-                "https://www.linkedin.com/adoe",
+                "ai#1234",
+                "https://www.linkedin.com/adoedsad",
                 "New York",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_first_name_min_length",
             ),
             # Test case 2: Invalid first_name (maxlength + 1)
             pytest.param(
-                "JohnJohJohnJohnJohnJ",
+                "Ttttttttttttttttttttt",
                 "Smith",
                 1,
                 "+380999999999",
@@ -64,8 +65,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/johnsmith",
                 "San Francisco",
                 True,
-                1,
+                [1],
                 "VIP",
+                1,
                 400,
                 id="test_invalid_first_name_max_length",
             ),
@@ -77,15 +79,62 @@ class TestParticipantsPageOfTheAdminPanel:
                 "+380999999999",
                 "a@example.com",
                 "Comment",
-                "a#1234",
+                "ana#1234",
                 "https://www.linkedin.com/adoe",
                 "New York",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_first_name_null",
             ),
+        ]
+    )
+    def test_participant_admin_panel_first_name_errors(
+        self,
+        user_project,
+        first_name,
+        last_name,
+        speciality,
+        phone_number,
+        email,
+        comment,
+        account_discord,
+        account_linkedin,
+        city,
+        experience,
+        project,
+        stack,
+        type_participant,
+        status_code,
+        test_id
+    ):
+        payload = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "speciality": speciality,
+            "phone_number": phone_number,
+            "email": email,
+            "comment": comment,
+            "account_discord": account_discord,
+            "account_linkedin": account_linkedin,
+            "city": city,
+            "experience": experience,
+            "project": project,
+            "stack": stack,
+            "type_participant": type_participant,
+
+        }
+        response = user_project.add_participant(payload)
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["first_name"][0]).is_equal_to(CREATE_PARTICIPANT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "first_name, last_name, speciality, phone_number, email, comment, account_discord,"
+        " account_linkedin, city, experience, project, stack, type_participant, status_code",
+        [
             # Test case 4: Invalid last_name (minlength - 1)
             pytest.param(
                 "Jane",
@@ -98,8 +147,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/janed",
                 "San Francisco",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_last_name_min_length",
             ),
@@ -115,8 +165,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/alice",
                 "Los Angeles",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_last_name_max_length",
             ),
@@ -132,16 +183,63 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/johnsmith",
                 "San Francisco",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_last_name_null",
             ),
+        ]
+    )
+    def test_participant_admin_panel_last_name_errors(
+            self,
+            user_project,
+            first_name,
+            last_name,
+            speciality,
+            phone_number,
+            email,
+            comment,
+            account_discord,
+            account_linkedin,
+            city,
+            experience,
+            project,
+            stack,
+            type_participant,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "speciality": speciality,
+            "phone_number": phone_number,
+            "email": email,
+            "comment": comment,
+            "account_discord": account_discord,
+            "account_linkedin": account_linkedin,
+            "city": city,
+            "experience": experience,
+            "project": project,
+            "stack": stack,
+            "type_participant": type_participant,
+
+        }
+        response = user_project.add_participant(payload)
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["last_name"][0]).is_equal_to(CREATE_PARTICIPANT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "first_name, last_name, speciality, phone_number, email, comment, account_discord,"
+        " account_linkedin, city, experience, project, stack, type_participant, status_code",
+        [
             # Test case 7: Invalid speciality (NULL)
             pytest.param(
                 "Mike",
                 "Johnson",
-                None,
+                "sometext",
                 "+380999999999",
                 "mike@example.com",
                 "Comment",
@@ -149,11 +247,58 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/mikejohnson",
                 "Chicago",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
-                id="test_invalid_speciality_null",
+                id="test_invalid_speciality_str",
             ),
+        ]
+    )
+    def test_participant_admin_panel_speciality_errors(
+            self,
+            user_project,
+            first_name,
+            last_name,
+            speciality,
+            phone_number,
+            email,
+            comment,
+            account_discord,
+            account_linkedin,
+            city,
+            experience,
+            project,
+            stack,
+            type_participant,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "speciality": speciality,
+            "phone_number": phone_number,
+            "email": email,
+            "comment": comment,
+            "account_discord": account_discord,
+            "account_linkedin": account_linkedin,
+            "city": city,
+            "experience": experience,
+            "project": project,
+            "stack": stack,
+            "type_participant": type_participant,
+
+        }
+        response = user_project.add_participant(payload)
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["speciality"][0]).is_equal_to(CREATE_PARTICIPANT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "first_name, last_name, speciality, phone_number, email, comment, account_discord,"
+        " account_linkedin, city, experience, project, stack, type_participant, status_code",
+        [
             # Test case 8: Invalid phone_number (minlength - 1)
             pytest.param(
                 "Max",
@@ -166,8 +311,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/maxsmith",
                 "Los Angeles",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_phone_number_min_length",
             ),
@@ -179,12 +325,13 @@ class TestParticipantsPageOfTheAdminPanel:
                 "+3809999999999",
                 "olivia@example.com",
                 "Comment",
-                "olivia#1234" + "a" * 25,
+                "olivia#1234",
                 "https://www.linkedin.com/oliviajohnson",
                 "Chicago",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_phone_number_max_length",
             ),
@@ -200,11 +347,58 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/oliverjohnson",
                 "San Francisco",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_phone_number_null",
             ),
+        ]
+    )
+    def test_participant_admin_panel_phone_number_errors(
+            self,
+            user_project,
+            first_name,
+            last_name,
+            speciality,
+            phone_number,
+            email,
+            comment,
+            account_discord,
+            account_linkedin,
+            city,
+            experience,
+            project,
+            stack,
+            type_participant,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "speciality": speciality,
+            "phone_number": phone_number,
+            "email": email,
+            "comment": comment,
+            "account_discord": account_discord,
+            "account_linkedin": account_linkedin,
+            "city": city,
+            "experience": experience,
+            "project": project,
+            "stack": stack,
+            "type_participant": type_participant,
+
+        }
+        response = user_project.add_participant(payload)
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["phone_number"][0]).is_equal_to(CREATE_PARTICIPANT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "first_name, last_name, speciality, phone_number, email, comment, account_discord,"
+        " account_linkedin, city, experience, project, stack, type_participant, status_code",
+        [
             # Test case 11: Invalid email (minlength - 1)
             pytest.param(
                 "Bob",
@@ -217,8 +411,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/bobjohnson",
                 "Chicago",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_email_min_length",
             ),
@@ -234,8 +429,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/eleanorrigby",
                 "Liverpool",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_email_max_length",
             ),
@@ -251,8 +447,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/davidsmith",
                 "New York",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_email_null",
             ),
@@ -268,11 +465,58 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/davidsmith",
                 "New York",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_email_format",
             ),
+        ]
+    )
+    def test_participant_admin_panel_email_errors(
+            self,
+            user_project,
+            first_name,
+            last_name,
+            speciality,
+            phone_number,
+            email,
+            comment,
+            account_discord,
+            account_linkedin,
+            city,
+            experience,
+            project,
+            stack,
+            type_participant,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "speciality": speciality,
+            "phone_number": phone_number,
+            "email": email,
+            "comment": comment,
+            "account_discord": account_discord,
+            "account_linkedin": account_linkedin,
+            "city": city,
+            "experience": experience,
+            "project": project,
+            "stack": stack,
+            "type_participant": type_participant,
+
+        }
+        response = user_project.add_participant(payload)
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["email"][0]).is_equal_to(CREATE_PARTICIPANT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "first_name, last_name, speciality, phone_number, email, comment, account_discord,"
+        " account_linkedin, city, experience, project, stack, type_participant, status_code",
+        [
             # Test case 15: Invalid discord (minlength - 1)
             pytest.param(
                 "Sophia",
@@ -281,12 +525,13 @@ class TestParticipantsPageOfTheAdminPanel:
                 "+380999999999",
                 "sophia@example.com",
                 "Comment",
-                "soph",
+                "s#1111",
                 "https://www.linkedin.com/sophiasmith",
                 "LA",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_discord_min_length",
             ),
@@ -298,12 +543,13 @@ class TestParticipantsPageOfTheAdminPanel:
                 "+380999999999",
                 "oliver@example.com",
                 "Comment",
-                "oliver#1234",
+                "oliveraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa#1234",
                 "https://www.linkedin.com/oliverjohnson",
                 "San Francisco" + "a" * 40,
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_discord_max_length",
             ),
@@ -315,15 +561,62 @@ class TestParticipantsPageOfTheAdminPanel:
                 "+380999999999",
                 "alex@example.com",
                 "Comment",
-                "alex#5678",
+                None,
                 "https://www.linkedin.com/a" + "a" * 10,
                 "San Francisco",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_discord_null",
             ),
+        ]
+    )
+    def test_participant_admin_panel_account_discord_errors(
+            self,
+            user_project,
+            first_name,
+            last_name,
+            speciality,
+            phone_number,
+            email,
+            comment,
+            account_discord,
+            account_linkedin,
+            city,
+            experience,
+            project,
+            stack,
+            type_participant,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "speciality": speciality,
+            "phone_number": phone_number,
+            "email": email,
+            "comment": comment,
+            "account_discord": account_discord,
+            "account_linkedin": account_linkedin,
+            "city": city,
+            "experience": experience,
+            "project": project,
+            "stack": stack,
+            "type_participant": type_participant,
+
+        }
+        response = user_project.add_participant(payload)
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["account_discord"][0]).is_equal_to(CREATE_PARTICIPANT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "first_name, last_name, speciality, phone_number, email, comment, account_discord,"
+        " account_linkedin, city, experience, project, stack, type_participant, status_code",
+        [
             # Test case 18: Invalid city (minlength - 1)
             pytest.param(
                 "Sophia",
@@ -334,10 +627,11 @@ class TestParticipantsPageOfTheAdminPanel:
                 "Comment",
                 "sophia#5678",
                 "https://www.linkedin.com/sophiasmith",
-                "LA",
+                "L",
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_city_min_length",
             ),
@@ -353,8 +647,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/oliverjohnson",
                 "San Francisco" + "a" * 40,
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_city_max_length",
             ),
@@ -370,11 +665,58 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/a" + "a" * 10,
                 None,
                 True,
-                1,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_city_null",
             ),
+        ]
+    )
+    def test_participant_admin_panel_city_errors(
+            self,
+            user_project,
+            first_name,
+            last_name,
+            speciality,
+            phone_number,
+            email,
+            comment,
+            account_discord,
+            account_linkedin,
+            city,
+            experience,
+            project,
+            stack,
+            type_participant,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "speciality": speciality,
+            "phone_number": phone_number,
+            "email": email,
+            "comment": comment,
+            "account_discord": account_discord,
+            "account_linkedin": account_linkedin,
+            "city": city,
+            "experience": experience,
+            "project": project,
+            "stack": stack,
+            "type_participant": type_participant,
+
+        }
+        response = user_project.add_participant(payload)
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["city"][0]).is_equal_to(CREATE_PARTICIPANT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "first_name, last_name, speciality, phone_number, email, comment, account_discord,"
+        " account_linkedin, city, experience, project, stack, type_participant, status_code",
+        [
             # Test case 21: Invalid experience (NULL)
             pytest.param(
                 "David",
@@ -386,12 +728,59 @@ class TestParticipantsPageOfTheAdminPanel:
                 "david#5678",
                 "https://www.linkedin.com/davidsmith",
                 "New York",
-                True,
                 None,
+                [1],
                 "Regular",
+                1,
                 400,
                 id="test_invalid_experience_null",
             ),
+        ]
+    )
+    def test_participant_admin_panel_experience_errors(
+            self,
+            user_project,
+            first_name,
+            last_name,
+            speciality,
+            phone_number,
+            email,
+            comment,
+            account_discord,
+            account_linkedin,
+            city,
+            experience,
+            project,
+            stack,
+            type_participant,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "speciality": speciality,
+            "phone_number": phone_number,
+            "email": email,
+            "comment": comment,
+            "account_discord": account_discord,
+            "account_linkedin": account_linkedin,
+            "city": city,
+            "experience": experience,
+            "project": project,
+            "stack": stack,
+            "type_participant": type_participant,
+
+        }
+        response = user_project.add_participant(payload)
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["experience"][0]).is_equal_to(CREATE_PARTICIPANT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "first_name, last_name, speciality, phone_number, email, comment, account_discord,"
+        " account_linkedin, city, experience, project, stack, type_participant, status_code",
+        [
             # Test case 22: Invalid stack (minlength - 1)
             pytest.param(
                 "David",
@@ -404,8 +793,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/davidsmith",
                 "New York",
                 True,
+                [1],
+                "R",
                 1,
-                "Regular",
                 400,
                 id="test_invalid_stack_min_length",
             ),
@@ -418,11 +808,12 @@ class TestParticipantsPageOfTheAdminPanel:
                 "lucas@example.com",
                 "Comment",
                 "lucas#9876",
-                "https://www.linkedin.com/lucasdavis" + "a" * 109,
+                "https://www.linkedin.com/lucasdavisaaaaaaaa",
                 "Chicago",
                 True,
+                [1],
+                "Regular"*50,
                 1,
-                "Regular",
                 400,
                 id="test_invalid_stack_max_length",
             ),
@@ -438,46 +829,32 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/lucasdavis",
                 "Chicago",
                 True,
-                1,
+                [1],
                 None,
+                1,
                 400,
                 id="test_invalid_stack_null",
             ),
-            # Test case 25: Adding participant to non-existent project
-            pytest.param(
-                "David",
-                "Smith",
-                1,
-                "+380999999999",
-                "david@example.com",
-                "Comment",
-                "david#5678",
-                "https://www.linkedin.com/davidsmith",
-                "New York",
-                True,
-                1,
-                "Regular",
-                400,
-                id="test_adding_to_nonexistent_project",
-            ),
-        ],
+        ]
     )
-    def test_create_participant(
-        self,
-        user_project,
-        first_name,
-        last_name,
-        speciality,
-        phone_number,
-        email,
-        comment,
-        account_discord,
-        account_linkedin,
-        city,
-        experience,
-        project,
-        stack,
-        status_code_for_create,
+    def test_participant_admin_panel_stack_errors(
+            self,
+            user_project,
+            first_name,
+            last_name,
+            speciality,
+            phone_number,
+            email,
+            comment,
+            account_discord,
+            account_linkedin,
+            city,
+            experience,
+            project,
+            stack,
+            type_participant,
+            status_code,
+            test_id
     ):
         payload = {
             "first_name": first_name,
@@ -492,13 +869,78 @@ class TestParticipantsPageOfTheAdminPanel:
             "experience": experience,
             "project": project,
             "stack": stack,
+            "type_participant": type_participant,
+
         }
         response = user_project.add_participant(payload)
-        assert response.status_code == status_code_for_create
-        # try:
-        #     LoginSuccessResponse(**response.json())
-        # except ValidationError as err:
-        #     pytest.fail(f"Response validation failed: {err}")
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["stack"][0]).is_equal_to(CREATE_PARTICIPANT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "first_name, last_name, speciality, phone_number, email, comment, account_discord,"
+        " account_linkedin, city, experience, project, stack, type_participant, status_code",
+        [
+            # Test case 25: Adding participant to non-existent project
+            pytest.param(
+                "David",
+                "Smith",
+                1,
+                "+380999999999",
+                "david@example.com",
+                "Comment",
+                "david#5678",
+                "https://www.linkedin.com/davidsmith",
+                "New York",
+                True,
+                [1000],
+                "Regular",
+                1,
+                400,
+                id="test_adding_to_nonexistent_project",
+            ),
+        ]
+    )
+    def test_participant_admin_panel_project_errors(
+            self,
+            user_project,
+            first_name,
+            last_name,
+            speciality,
+            phone_number,
+            email,
+            comment,
+            account_discord,
+            account_linkedin,
+            city,
+            experience,
+            project,
+            stack,
+            type_participant,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "speciality": speciality,
+            "phone_number": phone_number,
+            "email": email,
+            "comment": comment,
+            "account_discord": account_discord,
+            "account_linkedin": account_linkedin,
+            "city": city,
+            "experience": experience,
+            "project": project,
+            "stack": stack,
+            "type_participant": type_participant,
+
+        }
+        response = user_project.add_participant(payload)
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["project"][0]).is_equal_to(CREATE_PARTICIPANT_ERRORS[test_id])
+
 
     def get_id_participant(self, participant):
         response = participant
@@ -508,7 +950,7 @@ class TestParticipantsPageOfTheAdminPanel:
 
     @pytest.mark.parametrize(
         "first_name, last_name, speciality, phone_number, email, comment, account_discord, account_linkedin, city,"
-        " experience, project, stack, status_code",
+        " experience, project, stack, type_participant, status_code",
         [
             pytest.param(
                 "Anna",
@@ -521,8 +963,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/in/anastasiia",
                 "string",
                 False,
-                [2, 3],
+                [2],
                 "QA Manual",
+                1,
                 201,
                 id="test_change_valid_id",
             ),
@@ -538,8 +981,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/in/anastasiia",
                 "city",
                 True,
-                [2, 3],
+                [2],
                 "QA Manual",
+                1,
                 201,
                 id="test_change_valid_last_name",
             ),
@@ -555,8 +999,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/in/anastasiia",
                 "city",
                 True,
-                [2, 3],
+                [2],
                 "QA Manual",
+                1,
                 201,
                 id="test_change_valid_role",
             ),
@@ -572,8 +1017,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/in/anastasiia",
                 "city",
                 True,
-                [2, 3],
+                [2],
                 "QA Manual",
+                1,
                 201,
                 id="test_change_valid_phone_number",
             ),
@@ -589,8 +1035,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/in/anastasiia",
                 "city",
                 True,
-                [2, 3],
+                [2],
                 "QA Manual",
+                1,
                 201,
                 id="test_change_valid_email",
             ),
@@ -606,8 +1053,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/in/anastasiia",
                 "city",
                 True,
-                [2, 3],
+                [2],
                 "QA Manual",
+                1,
                 201,
                 id="test_change_valid_comment",
             ),
@@ -623,8 +1071,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/in/anastasiia",
                 "city",
                 True,
-                [2, 3],
+                [2],
                 "QA Manual",
+                1,
                 201,
                 id="test_change_valid_discord",
             ),
@@ -640,8 +1089,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/in/anastasiia",
                 "city",
                 True,
-                [2, 3],
+                [2],
                 "QA Manual",
+                1,
                 201,
                 id="test_change_valid_linkedin",
             ),
@@ -657,8 +1107,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/in/anastasiia",
                 "city",
                 True,
-                [2, 3],
+                [2],
                 "QA Manual",
+                1,
                 201,
                 id="test_change_valid_city",
             ),
@@ -674,8 +1125,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/in/anastasiia",
                 "city",
                 True,
-                [2, 3],
+                [2],
                 "QA Manual",
+                1,
                 201,
                 id="test_change_valid_experience",
             ),
@@ -691,8 +1143,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/in/anastasiia",
                 "city",
                 True,
-                [2, 3],
+                [2],
                 "QA Manual",
+                1,
                 201,
                 id="test_change_valid_project",
             ),
@@ -708,8 +1161,9 @@ class TestParticipantsPageOfTheAdminPanel:
                 "https://www.linkedin.com/in/anastasiia",
                 "city",
                 True,
-                [2, 3],
+                [2],
                 "QA Manual",
+                1,
                 201,
                 id="test_change_valid_stack",
             ),
@@ -731,6 +1185,7 @@ class TestParticipantsPageOfTheAdminPanel:
         experience,
         project,
         stack,
+        type_participant,
         status_code,
     ):
         participant_id = self.get_id_participant(participant)
@@ -747,6 +1202,7 @@ class TestParticipantsPageOfTheAdminPanel:
             "experience": experience,
             "project": project,
             "stack": stack,
+            "type_participant": type_participant,
         }
         response = user_project.update_participant(
             participant_id=participant_id, data=payload
@@ -767,4 +1223,4 @@ class TestParticipantsPageOfTheAdminPanel:
         participant_id = self.get_id_participant(participant)
         response_delete = user_project.delete_participant(participant_id=participant_id)
         response_delete.raise_for_status()
-        print(response_delete.json())
+

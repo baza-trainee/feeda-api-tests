@@ -119,6 +119,7 @@ def participant(user_project):
         "experience": False,
         "project": [2, 3],
         "stack": "QA Manual",
+        "type_participant": 1
     }
 
     response = user_project.add_participant(data=payload)
