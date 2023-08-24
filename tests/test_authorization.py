@@ -312,4 +312,4 @@ class TestAuth:
         response = users.logout(data=payload)
 
         with soft_assertions():
-            assert_that(response.status_code).is_equal_to(404)
+            assert_that(response.status_code).is_equal_to(401)
