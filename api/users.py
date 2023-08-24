@@ -33,9 +33,11 @@ class Users:
     @allure.step("Logout")
     def logout(self, data: dict) -> requests.Response:
         url = f"{self.base_url}/users/logout/"
+        headers = self.headers
+        headers["Authorization"] = f"Token {data['token']}"
 
         try:
-            response = requests.delete(url, headers=self.headers, json=data)
+            response = requests.delete(url, headers=headers, json=data)
             if response.status_code != 400:
                 response.raise_for_status()
         except requests.exceptions.RequestException as err:
