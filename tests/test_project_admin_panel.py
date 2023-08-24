@@ -1,4 +1,3 @@
-import json
 import pytest
 from assertpy import assert_that, soft_assertions
 
@@ -8,6 +7,29 @@ CREATE_PROJECT_ERRORS = {
     "test_wrong_format_end_date_project": "Date has wrong format. Use one of these formats instead: YYYY-MM-DD.",
     "test_invalid_start_date_format": "Date has wrong format. Use one of these formats instead: YYYY-MM-DD.",
     "test_invalid_address_site": "Enter a valid URL.",
+}
+UPDATE_PROJECT_ERRORS = {
+    "test_invalid_project_type_format": "Incorrect type. Expected pk value, received str.",
+    "test_invalid_project_type_1000": "Invalid pk \"1000\" - object does not exist.",
+    "test_invalid_project_type_null": "This field may not be null.",
+    "test_invalid_complexity_format": "Incorrect type. Expected pk value, received str.",
+    "test_invalid_complexity_1000": "Invalid pk \"1000\" - object does not exist.",
+    "test_invalid_complexity_null": "This field may not be null.",
+    "test_invalid_project_status_format": "Incorrect type. Expected pk value, received str.",
+    "test_invalid_project_status_1000": "Invalid pk \"1000\" - object does not exist.",
+    "test_invalid_project_status_null": "This field may not be null.",
+    "test_invalid_title_format": "Not a valid string.",
+    "test_invalid_title_empty": "This field may not be blank.",
+    "test_invalid_title_maxLength+1": "Ensure this field has no more than 30 characters.",
+    "test_invalid_title_null": "This field may not be null.",
+    "test_invalid_comment_format": "Not a valid string.",
+    "test_invalid_comment_maxLength+1": "Ensure this field has no more than 50 characters.",
+    "test_invalid_start_date_project_dateformat": "Date has wrong format. Use one of these formats instead: YYYY-MM-DD.",
+    "test_invalid_start_date_project_empty": "Date has wrong format. Use one of these formats instead: YYYY-MM-DD.",
+    "test_invalid_start_date_project_null": "This field may not be null.",
+    "test_invalid_end_date_project_dateformat": "Date has wrong format. Use one of these formats instead: YYYY-MM-DD.",
+    "test_invalid_end_date_project_empty": "Date has wrong format. Use one of these formats instead: YYYY-MM-DD.",
+    "test_invalid_address_site_format": "Enter a valid URL.",
 }
 
 
@@ -339,13 +361,15 @@ class TestProjectAdminPanel:
 
     def test_get_view_project(self, user_project):
         response = user_project.filter_project()
-        assert response.raise_for_status()
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(200)
 
     def test_get_projects(self, user_project):
         response = user_project.projects_list()
-        assert response.raise_for_status()
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(200)
 
-    # # TODO Тут помилка, зробити баг репорт!!
+    # #TODO Тут помилка, зробити баг репорт!!
     # def test_update_team(self, user_project, project, participant):
     #     payload = json.dumps(
     #         {
@@ -361,177 +385,364 @@ class TestProjectAdminPanel:
     #         cmd_id=self.get_id_project(project=project), data=payload
     #     )
     #     assert response.raise_for_status()
+    @pytest.mark.parametrize(
+        "project_type, complexity, status, title, comment, start_date_project, end_date_project,"
+        " address_site, status_code",
+        [
+            pytest.param("strstr", 1, 1, "feeda1", "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_project_type_format"),
+            pytest.param(1000, 1, 1, "feeda1", "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_project_type_1000"),
+            pytest.param(None, 1, 1, "feeda1", "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_project_type_null"),
+        ]
+    )
+    def test_update_project_project_type_errors(
+        self,
+        project,
+        user_project,
+        project_type,
+        complexity,
+        status,
+        title,
+        comment,
+        start_date_project,
+        end_date_project,
+        address_site,
+        status_code,
+        test_id
+    ):
+        payload = {
+                "type_project": project_type,
+                "complexity": complexity,
+                "project_status":  status,
+                "title": title,
+                "comment": comment,
+                "start_date_project": start_date_project,
+                "end_date_project": end_date_project,
+                "address_site": address_site,
+                "url": self.get_url(project=project)
+            }
+        response = user_project.project_update(
+            project_url=self.get_url(project=project), data=payload
+        )
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["type_project"][0]).is_equal_to(UPDATE_PROJECT_ERRORS[test_id])
 
-    # @pytest.mark.parametrize(
-    #     "first_name, last_name, email, project_type, complexity, status, title, comment,"
-    #     " start_date_project, end_date_project, address_site, status_code",
-    #     [
-    #         # Test case 1: Valid project change data (system should return 200)
-    #         pytest.param(
-    #             {
-    #                 "first_name": "John",
-    #                 "last_name": "Doe",
-    #                 "email": "john.doe@example.com",
-    #                 "project_type": 2,
-    #                 "complexity": 3,
-    #                 "status": 1,
-    #                 "title": "Updated Research Project",
-    #                 "comment": "Revised research goals and approach.",
-    #                 "start_date_project": "2023-08-15",
-    #                 "end_date_project": "2024-01-31",
-    #                 "address_site": "https://www.updatedresearch.com",
-    #             },
-    #             200,
-    #             id="test_valid_project_change_data",
-    #         ),
-    #         # Test case 2: Invalid project status (system should return 400)
-    #         pytest.param(
-    #             {
-    #                 "first_name": "Alice",
-    #                 "last_name": "Smith",
-    #                 "email": "alice.smith@example.com",
-    #                 "project_type": 1,
-    #                 "complexity": 2,
-    #                 "status": 0,
-    #                 "title": "Project Update",
-    #                 "comment": "Making adjustments based on feedback.",
-    #                 "start_date_project": "2023-09-01",
-    #                 "end_date_project": "2023-12-15",
-    #                 "address_site": "https://www.projectupdate.com",
-    #             },
-    #             400,
-    #             id="test_invalid_project_status",
-    #         ),
-    #         # Test case 3: Empty title (system should return 400)
-    #         pytest.param(
-    #             {
-    #                 "first_name": "Emily",
-    #                 "last_name": "Johnson",
-    #                 "email": "emily.johnson@example.com",
-    #                 "project_type": 3,
-    #                 "complexity": 1,
-    #                 "status": 1,
-    #                 "title": "",
-    #                 "comment": "No title provided for the updated project.",
-    #                 "start_date_project": "2023-08-15",
-    #                 "end_date_project": "2023-10-31",
-    #                 "address_site": "https://www.updatedproject.com",
-    #             },
-    #             400,
-    #             id="test_empty_title",
-    #         ),
-    #         # Test case 4: Missing email (system should return 400)
-    #         pytest.param(
-    #             {
-    #                 "first_name": "Michael",
-    #                 "last_name": "Brown",
-    #                 "project_type": 2,
-    #                 "complexity": 2,
-    #                 "status": 1,
-    #                 "title": "Data Analysis Project",
-    #                 "comment": "Revised data analysis plan.",
-    #                 "start_date_project": "2023-07-01",
-    #                 "end_date_project": "2023-09-30",
-    #                 "address_site": "https://www.dataanalysis.com",
-    #             },
-    #             400,
-    #             id="test_missing_email",
-    #         ),
-    #         # Test case 5: Invalid end_date_project format (system should return 400)
-    #         pytest.param(
-    #             {
-    #                 "first_name": "Sarah",
-    #                 "last_name": "Miller",
-    #                 "email": "sarah.miller@example.com",
-    #                 "project_type": 1,
-    #                 "complexity": 1,
-    #                 "status": 1,
-    #                 "title": "Testing Project Update",
-    #                 "comment": "Revised testing approach.",
-    #                 "start_date_project": "2023-08-01",
-    #                 "end_date_project": "16-07-2023",
-    #                 "address_site": "https://www.testingprojectupdate.com",
-    #             },
-    #             400,
-    #             id="test_invalid_end_date_format",
-    #         ),
-    #         # Test case 6: End date before start date (system should return 400)
-    #         pytest.param(
-    #             {
-    #                 "first_name": "William",
-    #                 "last_name": "Davis",
-    #                 "email": "william.davis@example.com",
-    #                 "project_type": 3,
-    #                 "complexity": 2,
-    #                 "status": 1,
-    #                 "title": "Marketing Campaign Update",
-    #                 "comment": "Revised marketing strategy.",
-    #                 "start_date_project": "2023-10-01",
-    #                 "end_date_project": "2023-08-15",
-    #                 "address_site": "https://www.marketingcampaignupdate.com",
-    #             },
-    #             400,
-    #             id="test_end_date_before_start_date",
-    #         ),
-    #         # Test case 7: Missing address_site (system should return 400)
-    #         pytest.param(
-    #             {
-    #                 "first_name": "Daniel",
-    #                 "last_name": "Taylor",
-    #                 "email": "daniel.taylor@example.com",
-    #                 "project_type": 2,
-    #                 "complexity": 3,
-    #                 "status": 1,
-    #                 "title": "Updated Research Project",
-    #                 "comment": "Revised research goals and approach.",
-    #                 "start_date_project": "2023-10-01",
-    #                 "end_date_project": "2024-03-31",
-    #             },
-    #             400,
-    #             id="test_missing_address_site",
-    #         ),
-    #     ],
-    # )
-    # def test_update_project(
-    #     self,
-    #     project,
-    #     user_project,
-    #     first_name,
-    #     last_name,
-    #     email,
-    #     project_type,
-    #     complexity,
-    #     status,
-    #     title,
-    #     comment,
-    #     start_date_project,
-    #     end_date_project,
-    #     address_site,
-    #     status_code,
-    # ):
-    #     payload = json.dumps(
-    #         {
-    #             "participants": [
-    #                 {"first_name": first_name, "last_name": last_name, "email": email}
-    #             ],
-    #             "type_project": {"project_type": project_type},
-    #             "complexity": {"complexity": complexity},
-    #             "project_status": {"status": status},
-    #             "title": title,
-    #             "comment": comment,
-    #             "start_date_project": start_date_project,
-    #             "end_date_project": end_date_project,
-    #             "address_site": address_site,
-    #         }
-    #     )
-    #
-    #     response = user_project.project_update(
-    #         project_url=self.get_url(project=project), data=payload
-    #     )
-    #     assert response.status_code == status_code
+    @pytest.mark.parametrize(
+        "project_type, complexity, status, title, comment, start_date_project, end_date_project,"
+        " address_site, status_code",
+        [
+            pytest.param(1, "strstr", 1, "feeda1", "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_complexity_format"),
+            pytest.param(1, 1000, 1, "feeda1", "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_complexity_1000"),
+            pytest.param(1, None, 1, "feeda1", "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_complexity_null"),
+        ]
+    )
+    def test_update_project_complexity_errors(
+            self,
+            project,
+            user_project,
+            project_type,
+            complexity,
+            status,
+            title,
+            comment,
+            start_date_project,
+            end_date_project,
+            address_site,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "type_project": project_type,
+            "complexity": complexity,
+            "project_status": status,
+            "title": title,
+            "comment": comment,
+            "start_date_project": start_date_project,
+            "end_date_project": end_date_project,
+            "address_site": address_site,
+            "url": self.get_url(project=project)
+        }
+        response = user_project.project_update(
+            project_url=self.get_url(project=project), data=payload
+        )
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["complexity"][0]).is_equal_to(UPDATE_PROJECT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "project_type, complexity, status, title, comment, start_date_project, end_date_project,"
+        " address_site, status_code",
+        [
+            pytest.param(1, 1, "strstr", "feeda1", "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_project_status_format"),
+            pytest.param(1, 1, 1000, "feeda1", "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_project_status_1000"),
+            pytest.param(1, 1, None, "feeda1", "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_project_status_null"),
+        ]
+    )
+    def test_update_project_project_status_errors(
+            self,
+            project,
+            user_project,
+            project_type,
+            complexity,
+            status,
+            title,
+            comment,
+            start_date_project,
+            end_date_project,
+            address_site,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "type_project": project_type,
+            "complexity": complexity,
+            "project_status": status,
+            "title": title,
+            "comment": comment,
+            "start_date_project": start_date_project,
+            "end_date_project": end_date_project,
+            "address_site": address_site,
+            "url": self.get_url(project=project)
+        }
+        response = user_project.project_update(
+            project_url=self.get_url(project=project), data=payload
+        )
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["project_status"][0]).is_equal_to(UPDATE_PROJECT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "project_type, complexity, status, title, comment, start_date_project, end_date_project,"
+        " address_site, status_code",
+        [
+            pytest.param(1, 1, 1, False, "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_title_format"),
+            pytest.param(1, 1, 1, "", "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_title_empty"),
+            pytest.param(1, 1, 1, "t"*31, "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_title_maxLength+1"),
+            pytest.param(1, 1, 1, None, "hr app", "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_title_null"),
+        ]
+    )
+    def test_update_project_title_errors(
+            self,
+            project,
+            user_project,
+            project_type,
+            complexity,
+            status,
+            title,
+            comment,
+            start_date_project,
+            end_date_project,
+            address_site,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "type_project": project_type,
+            "complexity": complexity,
+            "project_status": status,
+            "title": title,
+            "comment": comment,
+            "start_date_project": start_date_project,
+            "end_date_project": end_date_project,
+            "address_site": address_site,
+            "url": self.get_url(project=project)
+        }
+        response = user_project.project_update(
+            project_url=self.get_url(project=project), data=payload
+        )
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["title"][0]).is_equal_to(UPDATE_PROJECT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "project_type, complexity, status, title, comment, start_date_project, end_date_project,"
+        " address_site, status_code",
+        [
+            pytest.param(1, 1, 1, "feeda1", False, "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_comment_format"),
+            pytest.param(1, 1, 1, "feeda1", "t"*51, "2003-07-16", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_comment_maxLength+1"),
+
+        ]
+    )
+    def test_update_project_comment_errors(
+            self,
+            project,
+            user_project,
+            project_type,
+            complexity,
+            status,
+            title,
+            comment,
+            start_date_project,
+            end_date_project,
+            address_site,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "type_project": project_type,
+            "complexity": complexity,
+            "project_status": status,
+            "title": title,
+            "comment": comment,
+            "start_date_project": start_date_project,
+            "end_date_project": end_date_project,
+            "address_site": address_site,
+            "url": self.get_url(project=project)
+        }
+        response = user_project.project_update(
+            project_url=self.get_url(project=project), data=payload
+        )
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["comment"][0]).is_equal_to(UPDATE_PROJECT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "project_type, complexity, status, title, comment, start_date_project, end_date_project,"
+        " address_site, status_code",
+        [
+            pytest.param(1, 1, 1, "feeda1", "hr app", "16-07-2003", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_start_date_project_dateformat"),
+            pytest.param(1, 1, 1, "feeda1", "hr app", "", "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_start_date_project_empty"),
+            pytest.param(1, 1, 1, "feeda1", "hr app", None, "2003-07-19", "https://www.google.com/", 400,
+                         id="test_invalid_title_null"),
+        ]
+    )
+    def test_update_project_start_date_project_errors(
+            self,
+            project,
+            user_project,
+            project_type,
+            complexity,
+            status,
+            title,
+            comment,
+            start_date_project,
+            end_date_project,
+            address_site,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "type_project": project_type,
+            "complexity": complexity,
+            "project_status": status,
+            "title": title,
+            "comment": comment,
+            "start_date_project": start_date_project,
+            "end_date_project": end_date_project,
+            "address_site": address_site,
+            "url": self.get_url(project=project)
+        }
+        response = user_project.project_update(
+            project_url=self.get_url(project=project), data=payload
+        )
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["start_date_project"][0]).is_equal_to(UPDATE_PROJECT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "project_type, complexity, status, title, comment, start_date_project, end_date_project,"
+        " address_site, status_code",
+        [
+            pytest.param(1, 1, 1, "feeda1", "hr app", "2003-07-13", "19-07-2003", "https://www.google.com/", 400,
+                         id="test_invalid_start_date_project_dateformat"),
+            pytest.param(1, 1, 1, "feeda1", "hr app", "2003-07-13", "", "https://www.google.com/", 400,
+                         id="test_invalid_start_date_project_empty"),
+        ]
+    )
+    def test_update_project_end_date_project_errors(
+            self,
+            project,
+            user_project,
+            project_type,
+            complexity,
+            status,
+            title,
+            comment,
+            start_date_project,
+            end_date_project,
+            address_site,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "type_project": project_type,
+            "complexity": complexity,
+            "project_status": status,
+            "title": title,
+            "comment": comment,
+            "start_date_project": start_date_project,
+            "end_date_project": end_date_project,
+            "address_site": address_site,
+            "url": self.get_url(project=project)
+        }
+        response = user_project.project_update(
+            project_url=self.get_url(project=project), data=payload
+        )
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["end_date_project"][0]).is_equal_to(UPDATE_PROJECT_ERRORS[test_id])
+
+    @pytest.mark.parametrize(
+        "project_type, complexity, status, title, comment, start_date_project, end_date_project,"
+        " address_site, status_code",
+        [
+            pytest.param(1, 1, 1, "feeda1", "hr app", "2003-07-16", "2003-07-19", "text", 400,
+                         id="test_invalid_address_site_format"),
+        ]
+    )
+    def test_update_project_address_site_errors(
+            self,
+            project,
+            user_project,
+            project_type,
+            complexity,
+            status,
+            title,
+            comment,
+            start_date_project,
+            end_date_project,
+            address_site,
+            status_code,
+            test_id
+    ):
+        payload = {
+            "type_project": project_type,
+            "complexity": complexity,
+            "project_status": status,
+            "title": title,
+            "comment": comment,
+            "start_date_project": start_date_project,
+            "end_date_project": end_date_project,
+            "address_site": address_site,
+            "url": self.get_url(project=project)
+        }
+        response = user_project.project_update(
+            project_url=self.get_url(project=project), data=payload
+        )
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(status_code)
+            assert_that(response.json()["address_site"][0]).is_equal_to(UPDATE_PROJECT_ERRORS[test_id])
 
     def test_delete_project(self, project, user_project):
         response = user_project.project_delete(
             project_url=self.get_url(project=project)
         )
-        assert response.raise_for_status()
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(200)

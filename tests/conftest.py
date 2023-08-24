@@ -84,9 +84,8 @@ def test_id(request):
 
 @pytest.fixture
 def project(user_project):
-    payload = json.dumps(
-        {
-            "title": "feeda",
+    payload = {
+            "title": "feeda1",
             "comment": "hr app",
             "type_project": 1,
             "complexity": 1,
@@ -94,9 +93,8 @@ def project(user_project):
             "start_date_project": "2003-07-16",
             "end_date_project": "2003-07-19",
             "address_site": "https://www.google.com/",
-            "url": "Unknown Type: slug",
         }
-    )
+
     response = user_project.create_project(data=payload)
     yield response
     parsed_response = response.json()
@@ -118,7 +116,7 @@ def participant(user_project):
         "city": "string",
         "experience": False,
         "project": [2, 3],
-        "stack": "QA Manual",
+        "stack": "QA Manual, Postman",
         "type_participant": 1
     }
 

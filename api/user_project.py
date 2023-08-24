@@ -147,10 +147,10 @@ class UserProject:
 
     @allure.step("Filter project")
     def filter_project(self) -> requests.Response:
-        url = f"{self.base_url}/user-project/filter-project/"
+        url = f"{self.base_url}/user-project/projects/"
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, headers=self.headers)
             if response.status_code != 404:
                 response.raise_for_status()
         except requests.exceptions.RequestException as err:
@@ -283,7 +283,7 @@ class UserProject:
 
         try:
             response = requests.put(url, headers=self.headers, json=data)
-            if response.status_code != 404:
+            if response.status_code != 400:
                 response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
@@ -341,6 +341,24 @@ class UserProject:
             response = requests.get(url, headers=self.headers)
             if response.status_code != 404:
                 response.raise_for_status()
+        except requests.exceptions.RequestException as err:
+            logging.error(f"An error occurred: {err}")
+            raise err
+        except Exception as err:
+            logging.error(f"An unknown error occurred: {err}")
+            raise err
+
+        log_response(response)
+
+        return response
+
+    @allure.step("Search participant")
+    def search_participant(self, param: str) -> requests.Response:
+        url = f"{self.base_url}/user-project/search-user/?query={param}"
+
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
             raise err

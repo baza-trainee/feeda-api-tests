@@ -38,7 +38,7 @@ class Users:
 
         try:
             response = requests.delete(url, headers=headers, json=data)
-            if response.status_code != 400:
+            if response.status_code != 401:
                 response.raise_for_status()
         except requests.exceptions.RequestException as err:
             logging.error(f"An error occurred: {err}")
