@@ -118,7 +118,7 @@ def participant(user_project):
         "city": "string",
         "experience": False,
         "project": [2, 3],
-        "stack": "QA Manual",
+        "stack": "QA Manual, Postman",
         "type_participant": 1
     }
 

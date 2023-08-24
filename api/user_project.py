@@ -351,3 +351,21 @@ class UserProject:
         log_response(response)
 
         return response
+
+    @allure.step("Search participant")
+    def search_participant(self, param: str) -> requests.Response:
+        url = f"{self.base_url}/user-project/search-user/?query={param}"
+
+        try:
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as err:
+            logging.error(f"An error occurred: {err}")
+            raise err
+        except Exception as err:
+            logging.error(f"An unknown error occurred: {err}")
+            raise err
+
+        log_response(response)
+
+        return response
