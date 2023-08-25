@@ -285,9 +285,8 @@ class TestProjectAdminPanel:
         "title, comment, type_project, complexity, project_status, start_date_project,"
         "end_date_project, address_site, status_code",
         [
-            # Test case 1: Valid project data (system should return 201)
             pytest.param(
-                "New Website Development",  # Title of the project
+                "New Website",  # Title of the project
                 "This project involves creating a modern website.",
                 1,  # Type of the project (1 for Web Development)
                 2,  # Complexity level (1 for Low, 2 for Medium, 3 for High)
@@ -329,6 +328,9 @@ class TestProjectAdminPanel:
         response = user_project.create_project(data=payload)
         with soft_assertions():
             assert_that(response.status_code).is_equal_to(status_code)
+        response = user_project.project_delete(project_url=response.json()["url"])
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(200)
 
 
     def get_id_participant(self, participant):
@@ -349,15 +351,17 @@ class TestProjectAdminPanel:
         url = parsed_response.get("url")
         return url
 
-    # def test_add_participant_to_project(self, user_project, project, participant):
-    #     payload = json.dumps(
-    #         {
-    #             "user": [self.get_id_participant(participant=participant)],
-    #             "project": self.get_id_project(project=project),
-    #         }
-    #     )
-    #     response = user_project.create_command(payload)
-    #     assert response.raise_for_status()
+    def test_add_participant_to_project(self, user_project, project, participant):
+        payload = {
+            "user": [
+                self.get_id_participant(participant=participant)
+            ],
+            "project": self.get_id_project(project=project),
+            "team_lead": self.get_id_participant(participant=participant)
+        }
+        response = user_project.create_command(payload)
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(201)
 
     def test_get_view_project(self, user_project):
         response = user_project.filter_project()
@@ -369,22 +373,27 @@ class TestProjectAdminPanel:
         with soft_assertions():
             assert_that(response.status_code).is_equal_to(200)
 
-    # #TODO Тут помилка, зробити баг репорт!!
-    # def test_update_team(self, user_project, project, participant):
-    #     payload = json.dumps(
-    #         {
-    #             "user": [self.get_id_participant(participant=participant)],
-    #             "project": {
-    #                 "title": "string",
-    #                 "start_date_project": "2023-07-18",
-    #                 "complexity": {"complexity": "string"},
-    #             },
-    #         }
-    #     )
-    #     response = user_project.command_update(
-    #         cmd_id=self.get_id_project(project=project), data=payload
-    #     )
-    #     assert response.raise_for_status()
+
+    def test_update_team(self, user_project, project, participant):
+        payload = {
+            "user": [
+                self.get_id_participant(participant=participant)
+            ],
+            "project": self.get_id_project(project=project),
+            "team_lead": self.get_id_participant(participant=participant)
+        }
+        response_create = user_project.create_command(payload)
+        payload = {
+                "user": [],
+                "project": self.get_id_project(project=project),
+            }
+        response = user_project.command_update(
+            cmd_id=response_create.json()["id"], data=payload
+        )
+        with soft_assertions():
+            assert_that(response.status_code).is_equal_to(201)
+
+
     @pytest.mark.parametrize(
         "project_type, complexity, status, title, comment, start_date_project, end_date_project,"
         " address_site, status_code",

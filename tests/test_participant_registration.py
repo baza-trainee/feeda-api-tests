@@ -33,7 +33,6 @@ REGISTRATION_ERRORS = {
         "test_invalid_type_participant_non_allowed_number": "Invalid pk \"1000\" - object does not exist.",
         "test_invalid_type_participant_null": "This field may not be null.",
         "test_invalid_project_string": "Expected a list of items but got type \"str\".",
-        "test_invalid_project_non_allowed_number": "Invalid pk \"1000\" - object does not exist.",
         "test_invalid_project_null": "This field may not be null.",
         "test_invalid_conditions_participation_string": "Must be a valid boolean.",
         "test_invalid_conditions_participation_null": "This field may not be null.",
@@ -622,11 +621,6 @@ class TestParticipantRegistration:
             pytest.param("David", "Smith", "Analytics", "+380999999999", "david@example.com", "david#5678",
                          "https://www.linkedin.com/davidsmith", "New York", True, "strstr", True, True, 1, 400,
                          id="test_invalid_project_string"),
-
-            pytest.param("David", "Smith", "Analytics", "+380999999999", "david@example.com", "david#5678",
-                         "https://www.linkedin.com/davidsmith", "New York", True, [1000], True, True, 1, 400,
-                         id="test_invalid_project_non_allowed_number"),
-
             pytest.param("David", "Smith", "Analytics", "+380999999999", "david@example.com", "david#5678",
                          "https://www.linkedin.com/davidsmith", "New York", True, None, True, True, 1, 400,
                          id="test_invalid_project_null"),

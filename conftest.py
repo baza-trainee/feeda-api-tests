@@ -1,5 +1,3 @@
-import json
-import pytest
 import configparser
 import os
 import subprocess
@@ -25,7 +23,7 @@ def serve_allure_report():
 
 @pytest.fixture(scope="session")
 def config():
-    config_file_path = os.path.join("../config", "config.ini")
+    config_file_path = os.path.join("config", "config.ini")
     config_parser = configparser.ConfigParser(os.environ)
     config_parser.read(config_file_path)
 
@@ -62,24 +60,6 @@ def test_id(request):
     yield request.node.callspec.id
 
 
-# @pytest.fixture
-# def token():
-#     url = "http://localhost:8000/users/login/"
-#
-#     payload = json.dumps({
-#         "email": "admin123@gmail.com",
-#         "password": "Feeda12345"
-#     })
-#     headers = {
-#         'Content-Type': 'application/json'
-#     }
-#
-#     response = requests.request("POST", url, headers=headers, data=payload)
-#     assert response.status_code == 200
-#
-#     token = json.loads(response.content)["token"]
-#
-#     yield token
 
 
 @pytest.fixture
@@ -128,3 +108,4 @@ def participant(user_project):
     participant_id = parsed_response.get("id")
 
     user_project.delete_participant(participant_id=participant_id)
+
